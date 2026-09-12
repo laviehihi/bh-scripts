@@ -87,7 +87,7 @@
                 const clicked = BH.clickAtRule(canvas, rule);
 
                 if (clicked) {
-                    BH.lastActionTime = Date.now();
+                    BH.lastActionTime = BH.originalDateNow();
                     BH.enterRerunRest();
                 }
 
@@ -113,7 +113,7 @@
                 const clicked = BH.clickAtRule(canvas, rule);
 
                 if (clicked) {
-                    BH.lastActionTime = Date.now();
+                    BH.lastActionTime = BH.originalDateNow();
                 }
 
                 BH.setMsg(`${time} • WB R${i + 1} → ${clicked ? 'CLICK' : 'BUSY'}`);
@@ -140,7 +140,7 @@
                 const clicked = BH.clickAtRule(canvas, rule);
 
                 if (clicked) {
-                    BH.lastActionTime = Date.now();
+                    BH.lastActionTime = BH.originalDateNow();
                 }
 
                 BH.setMsg(`${time} • R${i + 1} → ${clicked ? 'CLICK' : 'BUSY'}`);
@@ -238,7 +238,7 @@
     BH.checkAutoStop = function () {
         if (BH.activeAuto === null) return;
 
-        const elapsed = Date.now() - BH.lastActionTime;
+        const elapsed = BH.originalDateNow() - BH.lastActionTime;
 
         if (elapsed >= BH.AUTO_STOP_TIMEOUT) {
             const stopped = BH.activeAuto;
@@ -262,7 +262,7 @@
         }
 
         BH.activeAuto = auto;
-        BH.lastActionTime = Date.now();
+        BH.lastActionTime = BH.originalDateNow();
 
         BH.autoStopTimerId = BH.originalSetInterval(BH.checkAutoStop, 5000);
 
