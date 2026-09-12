@@ -1,6 +1,4 @@
 // afk/pvp.js
-// Flow PvP cho Bit Heroes Auto
-
 (function (global) {
     'use strict';
 
@@ -14,22 +12,22 @@
         priority: 1,
 
         // =========================================================
-        // BƯỚC 1 — MỞ (1 lần)
+        // BƯỚC 1 — MỞ PVP (noCheck)
         // =========================================================
-        open: {
-            x: 70,
-            y: 524,
-            hex: '#ffe954',
-            tol: 15,
-            waitAfter: 2000,
-            label: 'Icon PvP'
-        },
+        open: [
+            {
+                x: 70,
+                y: 524,
+                hex: '#ffe954',
+                noCheck: true,           // ← CLICK THẲNG
+                waitAfter: 2000,
+                label: 'Icon PvP'
+            }
+        ],
 
         // =========================================================
         // BƯỚC 2-5 — LOOP (3 lần)
         // =========================================================
-        // Mỗi vòng là 1 trận. Trước mỗi bước đều check nút 7 (out of ticket).
-        // Nếu thấy nút 7 → thoát loop → chạy close.
         loop: [
             {
                 x: 682,
@@ -53,9 +51,7 @@
                 hex: '#9cd01f',
                 tol: 15,
                 waitAfter: 30000,
-                label: 'Bắt đầu trận',
-                waitForNext: true,
-                waitForNextTimeout: 60000
+                label: 'Bắt đầu trận'
             },
             {
                 x: 672,
@@ -70,16 +66,18 @@
         loopCount: 3,
 
         // =========================================================
-        // BƯỚC 6 — ĐÓNG (1 lần, chạy sau loop)
+        // BƯỚC 6 — ĐÓNG PVP
         // =========================================================
-        close: {
-            x: 820,
-            y: 528,
-            hex: '#ffffff',
-            tol: 15,
-            waitAfter: 2000,
-            label: 'Đóng PvP'
-        }
+        close: [
+            {
+                x: 820,
+                y: 528,
+                hex: '#ffffff',
+                tol: 15,
+                waitAfter: 2000,
+                label: 'Đóng PvP'
+            }
+        ]
     };
 
 })(window);

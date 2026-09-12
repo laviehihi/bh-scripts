@@ -1,6 +1,4 @@
 // afk/tg.js
-// Flow TG (Trial/Gauntlet) cho Bit Heroes Auto
-
 (function (global) {
     'use strict';
 
@@ -14,26 +12,24 @@
         priority: 2,
 
         // =========================================================
-        // BƯỚC 1 — MỞ TG (1 lần)
+        // BƯỚC 1 — MỞ TG (noCheck)
         // =========================================================
-        // ⚠️ Tọa độ + màu này có thể thay đổi mỗi tuần:
-        //   - Tuần Trial: (934, 258) #f5b58a  ← hiện tại
-        //   - Tuần Gauntlet: cập nhật sau
-        open: {
-            x: 934,
-            y: 258,
-            hex: '#f5b58a',
-            tol: 15,
-            waitAfter: 2000,
-            label: 'Mở TG'
-        },
+        open: [
+            {
+                x: 934,
+                y: 258,
+                hex: '#f5b58a',
+                noCheck: true,           // ← CLICK THẲNG
+                waitAfter: 2000,
+                label: 'Mở TG'
+            }
+        ],
 
         // =========================================================
         // BƯỚC 2-4 — LOOP (3 lần)
         // =========================================================
         loop: [
             {
-                // Giống PvP nút 2
                 x: 682,
                 y: 352,
                 hex: '#34b4d3',
@@ -47,9 +43,7 @@
                 hex: '#a6d339',
                 tol: 15,
                 waitAfter: 30000,
-                label: 'Bắt đầu trận',
-                waitForNext: true,
-                waitForNextTimeout: 60000
+                label: 'Bắt đầu trận'
             },
             {
                 x: 462,
@@ -64,17 +58,18 @@
         loopCount: 3,
 
         // =========================================================
-        // BƯỚC 5 — ĐÓNG TG (1 lần)
+        // BƯỚC 5 — ĐÓNG TG
         // =========================================================
-        // Giống PvP close
-        close: {
-            x: 820,
-            y: 528,
-            hex: '#ffffff',
-            tol: 15,
-            waitAfter: 2000,
-            label: 'Đóng TG'
-        }
+        close: [
+            {
+                x: 820,
+                y: 528,
+                hex: '#ffffff',
+                tol: 15,
+                waitAfter: 2000,
+                label: 'Đóng TG'
+            }
+        ]
     };
 
 })(window);

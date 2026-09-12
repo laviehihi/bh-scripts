@@ -1,6 +1,4 @@
 // afk/wb.js
-// Flow WB (World Boss) cho Bit Heroes Auto
-
 (function (global) {
     'use strict';
 
@@ -14,21 +12,21 @@
         priority: 3,
 
         // =========================================================
-        // BƯỚC 1 — MỞ WB (1 lần)
+        // BƯỚC 1 — MỞ WB (noCheck)
         // =========================================================
         open: [
             {
                 x: 60,
                 y: 430,
                 hex: '#fffff3',
-                tol: 15,
+                noCheck: true,           // ← CLICK THẲNG
                 waitAfter: 2000,
                 label: 'Icon WB'
             }
         ],
 
         // =========================================================
-        // BƯỚC 2-4 — SETUP (1 lần, chạy trước loop)
+        // BƯỚC 2-4 — SETUP (1 lần)
         // =========================================================
         setup: [
             {
@@ -58,8 +56,7 @@
         ],
 
         // =========================================================
-        // BƯỚC 5-7 — LOOP (giống 3 nút WB Solo cũ)
-        // Số lần KHÔNG CỐ ĐỊNH — chạy đến khi thấy out-of-ticket
+        // BƯỚC 5-7 — LOOP (không cố định)
         // =========================================================
         loop: [
             {
@@ -84,9 +81,7 @@
                 hex: '#9cd01f',
                 tol: 15,
                 waitAfter: 30000,
-                label: 'Nút 7 (bắt đầu trận)',
-                waitForNext: true,
-                waitForNextTimeout: 120000
+                label: 'Nút 7 (bắt đầu trận)'
             }
         ],
 
@@ -94,7 +89,7 @@
         loopUntilTicket: true,
 
         // =========================================================
-        // BƯỚC 8-9 — ĐÓNG WB (1 lần)
+        // BƯỚC 8-9 — ĐÓNG WB
         // =========================================================
         close: [
             {

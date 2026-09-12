@@ -1,6 +1,4 @@
 // afk/raid.js
-// Flow Raid cho Bit Heroes Auto
-
 (function (global) {
     'use strict';
 
@@ -13,20 +11,24 @@
         enabled: true,
         priority: 4,
 
-        open: [],
-
         // =========================================================
-        // SETUP — 5 nút chạy tuần tự
+        // BƯỚC 1 — MỞ RAID (noCheck)
         // =========================================================
-        setup: [
+        open: [
             {
                 x: 68,
                 y: 342,
                 hex: '#b400a9',
-                tol: 15,
+                noCheck: true,           // ← CLICK THẲNG
                 waitAfter: 2000,
                 label: 'Icon Raid'
-            },
+            }
+        ],
+
+        // =========================================================
+        // BƯỚC 2-5 — SETUP (5 nút, chạy 1 lần)
+        // =========================================================
+        setup: [
             {
                 x: 682,
                 y: 226,
@@ -49,16 +51,13 @@
                 hex: '#9cd01f',
                 tol: 15,
                 waitAfter: 30000,
-                label: 'Xác nhận / Bắt đầu',
-                waitForNext: true,
-                waitForNextTimeout: 120000
+                label: 'Xác nhận / Bắt đầu'
             },
             {
-                // Nút Rerun — có 2 màu
                 x: 410,
                 y: 62,
                 hex: '#a6d339',
-                hexAlt: '#cbf067',       // Màu thay thế
+                hexAlt: '#cbf067',
                 tol: 15,
                 waitAfter: 2000,
                 label: 'Rerun'
@@ -68,7 +67,6 @@
         loop: [],
         loopCount: 0,
         close: [],
-
         noCloseOnTicket: true
     };
 
