@@ -6,22 +6,12 @@
 
     const BH = global.__BH__ = global.__BH__ || {};
 
-    // =========================================================
-    // STATE
-    // =========================================================
-
-    // 'expanded' | 'compact' | 'hidden'
     BH.overlayState = 'compact';
-
     BH.logBox = null;
     BH.lastMsg = '';
 
-    // =========================================================
-    // HELPERS
-    // =========================================================
-
     BH.getSpeedColor = function () {
-        return BH.getSpeed && BH.getSpeed() === 1 ? '#ddd' : '#66ff66';
+        return BH.getSpeed() === 1 ? '#ddd' : '#66ff66';
     };
 
     BH.getAutoColor = function (name) {
@@ -32,10 +22,6 @@
         if (BH.activeAuto !== 'rerun') return '';
         return BH.rerunPhase === 'rest' ? ' [nghỉ]' : ' [hunt]';
     };
-
-    // =========================================================
-    // LOG BOX
-    // =========================================================
 
     BH.ensureLogBox = function () {
         if (BH.logBox) return;
@@ -66,10 +52,6 @@
         (document.documentElement || document.body).appendChild(BH.logBox);
     };
 
-    // =========================================================
-    // RENDER COMPACT
-    // =========================================================
-
     BH.renderCompact = function () {
         BH.ensureLogBox();
 
@@ -80,7 +62,7 @@
         const rerunColor = BH.getAutoColor('rerun');
         const wbColor = BH.getAutoColor('wb');
         const scriptColor = BH.getAutoColor('script');
-        const speed = BH.getSpeed ? BH.getSpeed() : 1;
+        const speed = BH.getSpeed();
 
         BH.logBox.innerHTML = `
             <div style="
@@ -163,10 +145,6 @@
         `;
     };
 
-    // =========================================================
-    // RENDER EXPANDED
-    // =========================================================
-
     BH.renderExpanded = function () {
         BH.ensureLogBox();
 
@@ -180,7 +158,7 @@
 
         const remainStr = BH.getRemainingStr();
         const phaseStr = BH.getRerunPhaseStr();
-        const speed = BH.getSpeed ? BH.getSpeed() : 1;
+        const speed = BH.getSpeed();
 
         const ruleLines = BH.rules.length === 0
             ? '<div style="color:#a55;font-size:10px;">(chưa có rule — bấm 6)</div>'
@@ -230,7 +208,7 @@
                     color:#777;
                     font-size:10px;
                 ">
-                    v9.0
+                    v1.0
                 </span>
             </div>
 
@@ -417,10 +395,6 @@
         `;
     };
 
-    // =========================================================
-    // RENDER MAIN
-    // =========================================================
-
     BH.render = function () {
         if (BH.overlayState === 'hidden') {
             BH.ensureLogBox();
@@ -442,10 +416,6 @@
             BH.render();
         }
     };
-
-    // =========================================================
-    // CYCLE
-    // =========================================================
 
     BH.cycleOverlay = function () {
         if (BH.overlayState === 'expanded') {

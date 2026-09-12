@@ -6,15 +6,7 @@
 
     const BH = global.__BH__ = global.__BH__ || {};
 
-    // =========================================================
-    // STATE
-    // =========================================================
-
     BH.addModeIndicator = null;
-
-    // =========================================================
-    // INDICATOR
-    // =========================================================
 
     BH.ensureAddModeIndicator = function () {
         if (BH.addModeIndicator) return;
@@ -55,21 +47,12 @@
         (document.documentElement || document.body).appendChild(BH.addModeIndicator);
     };
 
-    // =========================================================
-    // SHOW / HIDE
-    // =========================================================
-
     BH.setAddModeVisible = function (visible) {
         BH.ensureAddModeIndicator();
 
         BH.addModeIndicator.style.display = visible ? 'block' : 'none';
     };
 
-    // =========================================================
-    // WIRE VÀO ENGINE
-    // =========================================================
-
-    // Engine gọi BH.onAddModeChange khi toggleAddMode
     BH.onAddModeChange = function (isAdding) {
         BH.setAddModeVisible(isAdding);
     };

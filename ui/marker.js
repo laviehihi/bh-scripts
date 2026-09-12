@@ -7,7 +7,7 @@
     const BH = global.__BH__ = global.__BH__ || {};
 
     // =========================================================
-    // PENDING MARKER (vòng cam nhấp nháy khi chờ lưu màu)
+    // PENDING MARKER
     // =========================================================
 
     BH.pendingMarker = null;
@@ -60,11 +60,10 @@
     };
 
     // =========================================================
-    // CLICK FLASH (hiệu ứng khi click auto)
+    // CLICK FLASH
     // =========================================================
 
     BH.showClickFlash = function (x, y) {
-        // Ripple ngoài
         const ripple = document.createElement('div');
 
         Object.assign(ripple.style, {
@@ -92,7 +91,6 @@
 
         setTimeout(function () { ripple.remove(); }, 400);
 
-        // Nút tròn trong
         const btn = document.createElement('div');
 
         Object.assign(btn.style, {
@@ -143,13 +141,8 @@
     // WIRE VÀO ENGINE
     // =========================================================
 
-    // Engine gọi BH.onClickFlash khi click
     BH.onClickFlash = BH.showClickFlash;
-
-    // Engine gọi BH.onPendingMarker khi lưu vị trí
     BH.onPendingMarker = BH.showPendingMarker;
-
-    // Engine gọi BH.onRemovePendingMarker khi lưu màu hoặc xoá rule
     BH.onRemovePendingMarker = BH.removePendingMarker;
 
 })(window);

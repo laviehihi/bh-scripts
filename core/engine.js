@@ -1,5 +1,5 @@
 // core/engine.js
-// Auto engine — click, check pixel, phase, start/stop, add rule
+// Auto engine
 
 (function (global) {
     'use strict';
@@ -12,8 +12,8 @@
 
     BH.rules = [];
 
-    BH.activeAuto = null;          // null | 'rerun' | 'wb' | 'script'
-    BH.rerunPhase = 'hunting';     // 'hunting' | 'rest'
+    BH.activeAuto = null;
+    BH.rerunPhase = 'hunting';
 
     BH.checkTimerId = null;
     BH.autoStopTimerId = null;
@@ -22,16 +22,15 @@
     BH.lastActionTime = 0;
 
     BH.isAddingRule = false;
-
     BH.isClicking = false;
 
     BH.lastMouseX = null;
     BH.lastMouseY = null;
 
-    // Callback cho UI (set từ main hoặc ui module)
     BH.onClickFlash = null;
     BH.onPendingMarker = null;
     BH.onRemovePendingMarker = null;
+    BH.onAddModeChange = null;
 
     // =========================================================
     // CLICK
@@ -56,12 +55,10 @@
             BH.onClickFlash(pos.clientX, pos.clientY);
         }
 
-        // Reset hover sau 100ms
         BH.originalSetTimeout(function () {
             BH.resetHover();
         }, 100);
 
-        // Mở lock sau 200ms
         BH.originalSetTimeout(function () {
             BH.isClicking = false;
         }, 200);

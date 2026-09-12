@@ -41,7 +41,7 @@
     // =========================================================
 
     BH.getRemainingStr = function () {
-        if (BH.activeAuto === null || !BH.activeAuto) return '';
+        if (!BH.activeAuto) return '';
 
         const elapsed = BH.originalDateNow() - BH.lastActionTime;
         const remain = BH.AUTO_STOP_TIMEOUT - elapsed;

@@ -119,7 +119,6 @@
         'keydown',
         function (e) {
 
-            // 1 = toggle help
             if (e.key === '1') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -127,7 +126,6 @@
                 return;
             }
 
-            // 2 = cycle overlay: expanded → compact → hidden
             if (e.key === '2') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -135,7 +133,6 @@
                 return;
             }
 
-            // 3 = auto rerun
             if (e.key === '3') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -143,7 +140,6 @@
                 return;
             }
 
-            // 4 = auto wb solo
             if (e.key === '4') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -151,7 +147,6 @@
                 return;
             }
 
-            // 5 = auto script
             if (e.key === '5') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -159,7 +154,6 @@
                 return;
             }
 
-            // 6 = add rule mode
             if (e.key === '6') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -167,7 +161,6 @@
                 return;
             }
 
-            // 0 = lưu vị trí (trong add mode)
             if (e.key === '0' && BH.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -175,7 +168,6 @@
                 return;
             }
 
-            // 9 = lưu màu (trong add mode)
             if (e.key === '9' && BH.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -183,7 +175,6 @@
                 return;
             }
 
-            // 8 = xoá rule cuối (trong add mode)
             if (e.key === '8' && BH.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -191,7 +182,6 @@
                 return;
             }
 
-            // = / + = tăng speed
             if (e.key === '=' || e.key === '+') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -199,7 +189,6 @@
                 return;
             }
 
-            // - = giảm speed
             if (e.key === '-') {
                 e.preventDefault();
                 e.stopImmediatePropagation();

@@ -6,7 +6,6 @@
 
     const BH = global.__BH__ = global.__BH__ || {};
 
-    // Cache WebGL
     BH.cachedCanvas = null;
     BH.cachedGL = null;
 

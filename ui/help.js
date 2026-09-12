@@ -6,16 +6,8 @@
 
     const BH = global.__BH__ = global.__BH__ || {};
 
-    // =========================================================
-    // STATE
-    // =========================================================
-
     BH.helpVisible = false;
     BH.helpBox = null;
-
-    // =========================================================
-    // HELP BOX
-    // =========================================================
 
     BH.ensureHelpBox = function () {
         if (BH.helpBox) return;
@@ -181,10 +173,6 @@
 
         (document.documentElement || document.body).appendChild(BH.helpBox);
     };
-
-    // =========================================================
-    // TOGGLE
-    // =========================================================
 
     BH.toggleHelp = function () {
         BH.helpVisible = !BH.helpVisible;

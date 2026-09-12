@@ -7,13 +7,8 @@
     const BH = global.__BH__ = global.__BH__ || {};
 
     // =========================================================
-    // SAVE ORIGINALS
+    // SAVE ORIGINALS (PHẢI LÀM TRƯỚC KHI OVERRIDE)
     // =========================================================
-
-    BH.MIN_SPEED = 1;
-    BH.MAX_SPEED = 10;
-
-    BH.speed = 1;
 
     const originalDateNow = Date.now;
     const originalPerformanceNow = window.performance.now.bind(window.performance);
@@ -23,13 +18,21 @@
     const originalClearInterval = window.clearInterval.bind(window);
     const originalRequestAnimationFrame = window.requestAnimationFrame.bind(window);
 
-    // Lưu để module khác dùng khi cần timing THỰC
-    BH.originalSetTimeout = originalSetTimeout;
-    BH.originalSetInterval = originalSetInterval;
-    BH.originalClearInterval = originalClearInterval;
-    BH.originalClearTimeout = originalClearTimeout;
     BH.originalDateNow = originalDateNow;
     BH.originalPerformanceNow = originalPerformanceNow;
+    BH.originalSetTimeout = originalSetTimeout;
+    BH.originalClearTimeout = originalClearTimeout;
+    BH.originalSetInterval = originalSetInterval;
+    BH.originalClearInterval = originalClearInterval;
+    BH.originalRequestAnimationFrame = originalRequestAnimationFrame;
+
+    // =========================================================
+    // SPEED STATE
+    // =========================================================
+
+    BH.MIN_SPEED = 1;
+    BH.MAX_SPEED = 10;
+    BH.speed = 1;
 
     // =========================================================
     // DATE.NOW
