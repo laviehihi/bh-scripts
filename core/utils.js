@@ -56,7 +56,7 @@
     };
 
     BH.nowTime = function () {
-        return new Date().toLocaleTimeString('vi-VN', { hour12: false });
+        return new Date(BH.originalDateNow()).toLocaleTimeString('vi-VN', { hour12: false });
     };
 
 })(window);
