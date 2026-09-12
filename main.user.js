@@ -16,6 +16,11 @@
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/help.js
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/marker.js
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/addmode.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/afk/afk.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/afk/pvp.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/afk/tg.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/afk/wb.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/afk/raid.js
 // ==/UserScript==
 
 (function () {
