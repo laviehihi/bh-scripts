@@ -7,15 +7,15 @@
 // @match        *://*.bitheroesgame.com/*
 // @run-at       document-start
 // @grant        none
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/core/utils.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/core/rules.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/core/pixel.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/core/speed-hack.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/core/engine.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/ui/overlay.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/ui/help.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/ui/marker.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/ui/addmode.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/core/utils.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/core/rules.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/core/pixel.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/core/speed-hack.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/core/engine.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/overlay.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/help.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/marker.js
+// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/addmode.js
 // ==/UserScript==
 
 (function () {
