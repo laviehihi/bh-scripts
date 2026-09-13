@@ -72,7 +72,7 @@
     BH.WBP.watchdogPaused = false;
 
     // =========================================================
-    // ĐỌC PIXEL (BUFFER)
+    // ĐỌC PIXEL — ĐỌC THẲNG BUFFER (giống Rerun)
     // =========================================================
 
     function readPixelBuf(bufX, bufY) {
@@ -89,7 +89,6 @@
         return BH.colorMatch(pixel, target, tol || 15);
     }
 
-    // Match với nhiều màu (VD: confirm có 2 màu)
     function matchAnyHex(pixel, hexes, tol) {
         if (!pixel) return false;
         for (let i = 0; i < hexes.length; i++) {
@@ -127,7 +126,7 @@
         }
     }
 
-    // Vẽ marker — tọa độ BUFFER → CSS để hiện
+    // Vẽ marker — nhận tọa độ BUFFER, convert sang client để hiển thị
     function drawDebugMarker(bufX, bufY, color, label) {
         if (!BH.WBP.config.showDebugMarkers) return;
 
@@ -136,15 +135,13 @@
         const canvas = BH.getCanvas();
         if (!canvas) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const clientX = rect.left + bufX * rect.width / canvas.width;
-        const clientY = rect.top + bufY * rect.height / canvas.height;
+        const pos = BH.bufferToClient(canvas, bufX, bufY);
 
         const dot = document.createElement('div');
         Object.assign(dot.style, {
             position: 'fixed',
-            left: `${clientX}px`,
-            top: `${clientY}px`,
+            left: `${pos.clientX}px`,
+            top: `${pos.clientY}px`,
             width: '14px',
             height: '14px',
             transform: 'translate(-50%, -50%)',
@@ -161,8 +158,8 @@
             const lbl = document.createElement('div');
             Object.assign(lbl.style, {
                 position: 'fixed',
-                left: `${clientX}px`,
-                top: `${clientY + 14}px`,
+                left: `${pos.clientX}px`,
+                top: `${pos.clientY + 14}px`,
                 transform: 'translateX(-50%)',
                 padding: '1px 4px',
                 background: 'rgba(0,0,0,0.8)',
@@ -250,17 +247,17 @@
         const canvas = BH.getCanvas();
         if (!canvas) return false;
 
-        // Convert buffer → client
         const rect = canvas.getBoundingClientRect();
-        const clientX = rect.left + bufX * rect.width / canvas.width;
-        const clientY = rect.top + bufY * rect.height / canvas.height;
+        if (rect.width <= 0 || rect.height <= 0) return false;
 
-        if (clientX < rect.left || clientX > rect.right) return false;
-        if (clientY < rect.top || clientY > rect.bottom) return false;
+        const pos = BH.bufferToClient(canvas, bufX, bufY);
+
+        if (pos.clientX < rect.left || pos.clientX > rect.right) return false;
+        if (pos.clientY < rect.top || pos.clientY > rect.bottom) return false;
 
         BH.WBP.isClicking = true;
 
-        BH.dispatchFullClick(canvas, clientX, clientY);
+        BH.dispatchFullClick(canvas, pos.clientX, pos.clientY);
 
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
