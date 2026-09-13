@@ -12,7 +12,7 @@
     // =========================================================
 
     BH.WBP.config = {
-        // 5 slot đếm số người
+        // 5 slot đếm số người (tọa độ CSS)
         slots: [
             { x: 140, y: 416, label: 'Slot 1', disabled: false },
             { x: 140, y: 358, label: 'Slot 2', disabled: false },
@@ -25,7 +25,7 @@
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút
+        // Nút (tọa độ CSS)
         readyStart: { x: 390, y: 70, hex: '#1267d3', tol: 15, label: 'Ready/Start' },
         yes: { x: 362, y: 206, hex: '#9cd01f', tol: 15, label: 'Yes' },
         regroup: { x: 592, y: 54, hex: '#9cd01f', tol: 15, label: 'Regroup' },
@@ -49,7 +49,10 @@
             x: 3,
             c: 4,
             v: 5
-        }
+        },
+
+        // Debug: hiện điểm sáng tại slot đang check
+        showDebugMarkers: true
     };
 
     // =========================================================
@@ -73,12 +76,18 @@
     // UTILS
     // =========================================================
 
-    function readPixelAt(x, y) {
+    // Convert CSS → buffer pixel, rồi đọc
+    function readPixelCSS(cssX, cssY) {
         const canvas = BH.getCanvas();
         if (!canvas) return null;
         const gl = BH.getGL(canvas);
         if (!gl) return null;
-        return BH.readPixel(gl, x, y);
+
+        const rect = canvas.getBoundingClientRect();
+        const bufX = Math.round(cssX * canvas.width / rect.width);
+        const bufY = Math.round(cssY * canvas.height / rect.height);
+
+        return BH.readPixel(gl, bufX, bufY);
     }
 
     function matchHex(pixel, hex, tol) {
@@ -87,44 +96,154 @@
         return BH.colorMatch(pixel, target, tol || 15);
     }
 
+    // =========================================================
+    // DEBUG MARKERS
+    // =========================================================
+
+    let debugLayer = null;
+
+    function ensureDebugLayer() {
+        if (debugLayer) return;
+
+        debugLayer = document.createElement('div');
+        Object.assign(debugLayer.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: '2147483646'
+        });
+
+        (document.documentElement || document.body).appendChild(debugLayer);
+    }
+
+    function clearDebugMarkers() {
+        if (debugLayer) {
+            debugLayer.innerHTML = '';
+        }
+    }
+
+    // Vẽ vòng tròn tại vị trí CSS
+    function drawDebugMarker(cssX, cssY, color, label) {
+        if (!BH.WBP.config.showDebugMarkers) return;
+
+        ensureDebugLayer();
+
+        const canvas = BH.getCanvas();
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const clientX = rect.left + cssX;
+        const clientY = rect.top + cssY;
+
+        const dot = document.createElement('div');
+        Object.assign(dot.style, {
+            position: 'fixed',
+            left: `${clientX}px`,
+            top: `${clientY}px`,
+            width: '14px',
+            height: '14px',
+            transform: 'translate(-50%, -50%)',
+            border: `2px solid ${color}`,
+            borderRadius: '50%',
+            boxShadow: `0 0 6px ${color}, 0 0 12px ${color}`,
+            pointerEvents: 'none',
+            zIndex: '2147483647'
+        });
+
+        debugLayer.appendChild(dot);
+
+        if (label) {
+            const lbl = document.createElement('div');
+            Object.assign(lbl.style, {
+                position: 'fixed',
+                left: `${clientX}px`,
+                top: `${clientY + 14}px`,
+                transform: 'translateX(-50%)',
+                padding: '1px 4px',
+                background: 'rgba(0,0,0,0.8)',
+                color: color,
+                fontSize: '8px',
+                fontFamily: 'Consolas, monospace',
+                fontWeight: '700',
+                borderRadius: '2px',
+                pointerEvents: 'none',
+                zIndex: '2147483647',
+                whiteSpace: 'nowrap'
+            });
+            lbl.textContent = label;
+            debugLayer.appendChild(lbl);
+        }
+    }
+
+    // =========================================================
+    // COUNT SLOTS
+    // =========================================================
+
     function countSlots() {
         let count = 0;
         const cfg = BH.WBP.config;
 
+        clearDebugMarkers();
+
         for (let i = 0; i < cfg.slots.length; i++) {
             const slot = cfg.slots[i];
-            const pixel = readPixelAt(slot.x, slot.y);
-            if (!pixel) continue;
+            const pixel = readPixelCSS(slot.x, slot.y);
+
+            if (!pixel) {
+                drawDebugMarker(slot.x, slot.y, '#666666', `${i + 1}:ERR`);
+                continue;
+            }
+
+            const hex = BH.rgbToHex(pixel);
 
             // Slot trống?
-            if (matchHex(pixel, cfg.emptyHex, cfg.tol)) continue;
+            if (matchHex(pixel, cfg.emptyHex, cfg.tol)) {
+                drawDebugMarker(slot.x, slot.y, '#ffcc00', `${i + 1}:empty`);
+                continue;
+            }
 
             // Slot 4/5 có thể disabled
             if (slot.disabled) {
-                if (matchHex(pixel, cfg.disabledHex, cfg.tol)) continue;
+                if (matchHex(pixel, cfg.disabledHex, cfg.tol)) {
+                    drawDebugMarker(slot.x, slot.y, '#888888', `${i + 1}:dis`);
+                    continue;
+                }
             }
 
+            // Slot có người
+            drawDebugMarker(slot.x, slot.y, '#00ff88', `${i + 1}:${hex}`);
             count++;
         }
 
         return count;
     }
 
+    // =========================================================
+    // CHECK CONFIRM
+    // =========================================================
+
     function checkConfirm() {
         const cfg = BH.WBP.config;
 
         for (let i = 0; i < cfg.confirmPoints.length; i++) {
             const p = cfg.confirmPoints[i];
-            const pixel = readPixelAt(p.x, p.y);
+            const pixel = readPixelCSS(p.x, p.y);
             if (!pixel) continue;
 
             if (matchHex(pixel, p.hex, p.tol)) {
-                return true;   // 1 trong 3 match → OK
+                return true;
             }
         }
 
         return false;
     }
+
+    // =========================================================
+    // CLICK
+    // =========================================================
 
     function clickAt(step) {
         if (BH.WBP.isClicking) return false;
@@ -132,15 +251,17 @@
         const canvas = BH.getCanvas();
         if (!canvas) return false;
 
-        const pos = BH.bufferToClient(canvas, step.x, step.y);
+        // Convert CSS → client
         const rect = canvas.getBoundingClientRect();
+        const clientX = rect.left + step.x;
+        const clientY = rect.top + step.y;
 
-        if (pos.clientX < rect.left || pos.clientX > rect.right) return false;
-        if (pos.clientY < rect.top || pos.clientY > rect.bottom) return false;
+        if (clientX < rect.left || clientX > rect.right) return false;
+        if (clientY < rect.top || clientY > rect.bottom) return false;
 
         BH.WBP.isClicking = true;
 
-        BH.dispatchFullClick(canvas, pos.clientX, pos.clientY);
+        BH.dispatchFullClick(canvas, clientX, clientY);
 
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
@@ -153,7 +274,7 @@
     }
 
     function matchClick(step) {
-        const pixel = readPixelAt(step.x, step.y);
+        const pixel = readPixelCSS(step.x, step.y);
         if (!matchHex(pixel, step.hex, step.tol)) return false;
         return clickAt(step);
     }
@@ -173,9 +294,7 @@
 
         const cfg = BH.WBP.config;
 
-        // =========================================================
-        // WATCHDOG
-        // =========================================================
+        // Watchdog
         if (!BH.WBP.watchdogPaused) {
             if (checkConfirm()) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
@@ -189,9 +308,7 @@
             }
         }
 
-        // =========================================================
-        // ĐẾM SLOT
-        // =========================================================
+        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -201,22 +318,16 @@
             return;
         }
 
-        // =========================================================
-        // ĐỦ NGƯỜI → BẤM READY/START
-        // =========================================================
+        // Đủ người → Start
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
         if (!matchClick(cfg.readyStart)) {
-            // Nút chưa hiện → chờ tick sau
             return;
         }
 
         setMsg('Đã bấm Ready/Start');
-
-        // Tạm dừng watchdog (đang vào trận)
         BH.WBP.watchdogPaused = true;
 
-        // Chờ 2s → check Yes
         BH.originalSetTimeout(function () {
             if (!BH.WBP.running) return;
 
@@ -224,7 +335,6 @@
                 setMsg('Đã bấm Yes (thiếu member)');
             }
 
-            // Chờ Regroup
             waitForRegroup();
         }, cfg.yesCheckDelay);
     }
@@ -242,18 +352,15 @@
                 BH.WBP.loopCount++;
                 setMsg(`✓ Vòng ${BH.WBP.loopCount} xong`);
 
-                // Resume watchdog
                 BH.WBP.watchdogPaused = false;
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
 
-                // Chờ 1s → quay lại tick
                 BH.originalSetTimeout(function () {
                     if (BH.WBP.running && BH.render) BH.render();
                 }, 1000);
                 return;
             }
 
-            // Timeout?
             if (BH.originalDateNow() - startTime > cfg.regroupTimeout) {
                 setMsg('⚠ Timeout chờ Regroup');
                 BH.WBP.watchdogPaused = false;
@@ -261,7 +368,6 @@
                 return;
             }
 
-            // Check lại sau 1s
             BH.originalSetTimeout(checkRegroup, 1000);
         };
 
@@ -275,7 +381,6 @@
     function startWBP() {
         if (BH.WBP.running) return;
 
-        // Tắt engine cũ nếu đang chạy
         if (BH.stopAuto) BH.stopAuto();
 
         BH.WBP.running = true;
@@ -302,6 +407,8 @@
             BH.WBP.timerId = null;
         }
 
+        clearDebugMarkers();
+
         if (BH.render) BH.render();
     }
 
@@ -326,7 +433,6 @@
 
     document.addEventListener('keydown', function (e) {
 
-        // Nếu chưa chạy → chỉ bắt phím 7 để bật
         if (!BH.WBP.running) {
             if (e.key === '7') {
                 e.preventDefault();
@@ -337,7 +443,6 @@
             return;
         }
 
-        // Đang chạy → bắt 7 + Z X C V
         if (e.key === '7') {
             e.preventDefault();
             e.stopImmediatePropagation();
