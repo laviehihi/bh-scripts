@@ -8,6 +8,7 @@ Hướng dẫn cài đặt và sử dụng script từ đầu.
 
 - **Trình duyệt:** Chrome, Edge, Firefox, Brave, hoặc bất kỳ trình duyệt nhân Chromium.
 - **Extension:** Tampermonkey (bắt buộc).
+- **Hệ điều hành khuyến nghị:** macOS (để thu nhỏ cửa sổ game hết cỡ, giúp tọa độ click chính xác hơn).
 
 ---
 
@@ -67,3 +68,217 @@ Tùy vào phiên bản trình duyệt, bạn cần bật **1 trong 2** tùy ch�
 4. **Copy toàn bộ** nội dung file `main.user.js` từ repo.
 5. **Paste** vào editor Tampermonkey (Ctrl+V).
 6. **Ctrl+S** để lưu.
+
+---
+
+### Bước 4: Kiểm tra
+
+1. Mở trang game.
+2. Đợi game load xong.
+3. Nhấn **F12** → tab **Console**.
+4. Tìm dòng log:
+5. Nếu thấy → **Thành công**.
+6. Nếu không → kiểm tra lại Bước 2 và Bước 3.
+
+---
+
+## ⚙️ Setup trước khi sử dụng bot
+
+### Quan trọng: Thu nhỏ cửa sổ game
+
+Trước khi setup bot, bạn **nên thu nhỏ cửa sổ game hết cỡ**.
+
+**Lý do:**
+
+- Canvas size càng nhỏ → tọa độ pixel càng ít bị lệch khi resize.
+- Trên macOS, thu nhỏ cửa sổ Chrome giúp canvas size ổn định → tọa độ click chính xác.
+- Nếu cửa sổ to → canvas size thay đổi → tọa độ setup sai.
+
+**Cách thu nhỏ:**
+
+1. Mở game.
+2. Kéo cửa sổ Chrome nhỏ lại (không cần maximize).
+3. Kích thước khuyến nghị: **500 × 337** hoặc nhỏ hơn (tùy màn hình).
+4. **Không thay đổi kích cỡ cửa sổ** sau khi setup xong.
+
+> ⚠️ **Lưu ý cho người dùng macOS:**
+> - Trên macOS, canvas size phụ thuộc vào kích cỡ cửa sổ.
+> - Thu nhỏ cửa sổ → canvas nhỏ → tọa độ ổn định.
+> - **KHÔNG** resize cửa sổ sau khi setup bot.
+
+---
+
+## 🎮 Hướng dẫn sử dụng
+
+### Phím tắt
+
+| Phím          | Chức năng                                           |
+| ------------- | --------------------------------------------------- |
+| **1**         | Hiện/ẩn bảng Help                                   |
+| **2**         | Overlay: mở → thu nhỏ → ẩn → mở                     |
+| **3**         | Auto Rerun (dành cho macOS — thu nhỏ game hết cỡ)   |
+| **4**         | Auto WB Solo (dành cho macOS — thu nhỏ game hết cỡ) |
+| **5**         | Auto Script (theo rules tự setup)                   |
+| **6**         | Vào/ra Add Rule Mode                                |
+| **7**         | Bật/tắt Team Mode                                   |
+| **Z**         | Team Mode: chế độ 2 người                           |
+| **X**         | Team Mode: chế độ 3 người                           |
+| **C**         | Team Mode: chế độ 4 người                           |
+| **V**         | Team Mode: chế độ 5 người                           |
+| **=** / **+** | Tăng tốc độ game                                    |
+| **-**         | Giảm tốc độ game                                    |
+| **0**         | (Trong Add Mode) Lưu vị trí                         |
+| **9**         | (Trong Add Mode) Lưu màu                            |
+| **8**         | (Trong Add Mode) Xoá rule cuối                      |
+
+---
+
+### Auto Rerun (Phím 3)
+
+> ⚠️ **Dành cho macOS** — cần thu nhỏ game hết cỡ để tọa độ chính xác.
+
+**Mục đích:** Tự động click nút Rerun khi trận xong.
+
+**Cách dùng:**
+
+1. Vào game, thu nhỏ cửa sổ hết cỡ.
+2. Vào trận đánh.
+3. Bấm **3** để bật.
+4. Script check nút Rerun mỗi 3 giây.
+5. Match → click → nghỉ 20 giây → lặp.
+6. Bấm **3** lần nữa để tắt.
+
+**Lưu ý:**
+
+- Tọa độ nút Rerun đã hard-code → chỉ đúng khi canvas size khớp với máy setup gốc.
+- Nếu dùng trên máy khác → cần setup lại (xem phần Add Rule bên dưới).
+
+---
+
+### Auto WB Solo (Phím 4)
+
+> ⚠️ **Dành cho macOS** — cần thu nhỏ game hết cỡ để tọa độ chính xác.
+
+**Mục đích:** Tự động đánh World Boss Solo.
+
+**Cách dùng:**
+
+1. Vào game, thu nhỏ cửa sổ hết cỡ.
+2. Bấm **4** để bật.
+3. Script check 3 nút của WB Solo mỗi 2 giây.
+4. Bấm **4** lần nữa để tắt.
+
+---
+
+### Auto Script (Phím 5)
+
+**Mục đích:** Tự động click theo **rules tự setup** (nhiều vị trí + màu). Đây là cách **linh hoạt nhất**, hoạt động với mọi kích cỡ cửa sổ nếu setup đúng.
+
+#### Cách setup rules
+
+**Bước 1:** Vào màn hình cần auto (VD: PvP, Raid, Dungeon, ...).
+
+**Bước 2:** Bấm **6** để vào **Add Rule Mode**.
+
+→ Bảng đỏ **"ADD RULE MODE"** hiện ở góc trái trên.
+
+**Bước 3:** Di chuột đến nút cần click.
+
+> ⚠️ **Chọn chỗ màu đẹp, không pha trộn:**
+> - Nên chọn giữa nút, màu đồng nhất.
+> - Tránh chữ, viền, icon, shadow, gradient.
+> - Tránh vùng có animation (nhấp nháy).
+
+**Bước 4:** Bấm **0** để lưu vị trí.
+
+→ Vòng cam nhấp nháy xuất hiện tại vị trí đã lưu.
+
+**Bước 5:** Di chuột ra xa nút (để nút tắt hover).
+
+**Bước 6:** Bấm **9** để lưu màu.
+
+→ Vòng cam biến mất → rule đã hoàn thành.
+
+**Bước 7:** Lặp lại bước 3-6 cho các nút khác.
+
+**Bước 8:** Bấm **6** để thoát Add Mode.
+
+**Bước 9:** Bấm **5** để bật Auto Script.
+
+#### Xoá rule
+
+- Bấm **6** → bấm **8** → xoá rule cuối.
+- Lặp lại nếu cần xoá nhiều rule.
+
+#### Lưu ý
+
+- Rules **tự động lưu** vào localStorage → F5 không mất.
+- Mỗi rule cần **vị trí + màu**.
+- Nếu click sai → xoá rule cuối, setup lại.
+- **Không thay đổi kích cỡ cửa sổ** sau khi setup.
+
+---
+
+### WB Mode (Phím 7)
+
+**Mục đích:** Tự động chơi theo **tổ đội** (đi nhiều người).
+
+> ⚠️ **Dành cho macOS** — cần thu nhỏ game hết cỡ để tọa độ chính xác.
+
+**Cách dùng:**
+
+1. Vào màn hình tổ đội (WB Team).
+2. Bấm **7** để bật.
+3. Chọn chế độ:
+- **Z** = 2 người.
+- **X** = 3 người.
+- **C** = 4 người.
+- **V** = 5 người.
+4. Script tự động:
+- Đếm số slot có người.
+- Đủ số người → bấm nút Ready/Start.
+- Nếu có popup xác nhận → bấm Yes.
+- Chờ xong → bấm Regroup → lặp.
+5. Bấm **7** lần nữa để tắt.
+
+**Lưu ý:**
+
+- Script check 3 điểm confirm để xác định đang ở màn WB.
+- Nếu không thấy confirm trong 3 phút → tự tắt.
+- Delay 1s trước khi click để tránh click nhầm.
+
+---
+
+### Speed Hack (Phím = / -)
+
+**Mục đích:** Tăng tốc độ game (animation, cooldown, ...).
+
+**Cách dùng:**
+
+1. Đợi game load xong.
+2. Bấm **=** để tăng tốc (mỗi lần +1).
+3. Bấm **-** để giảm tốc (mỗi lần -1).
+4. Speed hiện tại hiển thị trong overlay.
+
+**Lưu ý:**
+
+- Speed tối đa: **10×**.
+- Speed tối thiểu: **1×** (không hack).
+- **Không nên dùng speed quá cao** (> 5×) → có thể lag.
+
+---
+
+## 🎨 Tuỳ chỉnh
+
+### Đổi phím tắt
+
+Mở `main.user.js` trong Tampermonkey editor → tìm `if (e.key === '3')` → sửa `'3'` thành phím khác.
+
+### Đổi tốc độ check
+
+Mở `core/rules.js`:
+
+```javascript
+BH.RERUN_HUNT_INTERVAL = 3000;   // 3 giây
+BH.WB_INTERVAL = 2000;           // 2 giây
+BH.SCRIPT_INTERVAL = 3000;       // 3 giây
