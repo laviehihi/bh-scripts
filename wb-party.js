@@ -27,7 +27,6 @@
         readyStart: { x: 388, y: 66, hexes: ['#0a62d0', '#1fabd0'], tol: 15, label: 'Ready/Start' },
         yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
 
-        // Regroup — 3 vị trí (match 1 trong 3 là click)
         regroupPoints: [
             { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup 1' },
             { x: 442, y: 50, hex: '#9cd01f', tol: 15, label: 'Regroup 2' },
@@ -166,7 +165,6 @@
 
         BH.dispatchFullClick(canvas, pos.clientX, pos.clientY);
 
-        // Click flash effect
         if (BH.showClickFlash) {
             BH.showClickFlash(pos.clientX, pos.clientY);
         }
@@ -174,7 +172,12 @@
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
 
-        setTimeout(function () {
+        // Reset hover — click góc canvas (giống WB Solo)
+        BH.originalSetTimeout(function () {
+            if (BH.resetHover) BH.resetHover();
+        }, 100);
+
+        BH.originalSetTimeout(function () {
             BH.WBP.isClicking = false;
         }, 200);
 
@@ -229,7 +232,6 @@
 
         const cfg = BH.WBP.config;
 
-        // Watchdog + confirm
         const confirmed = checkConfirm();
         BH.WBP.confirmOk = confirmed;
 
@@ -246,14 +248,12 @@
             }
         }
 
-        // Chưa vào màn WB → chờ
         if (!confirmed && !BH.WBP.slotsLocked) {
             setMsg('Chưa vào màn WB — chờ');
             if (BH.render) BH.render();
             return;
         }
 
-        // Đang trong trận → chỉ check Regroup
         if (BH.WBP.slotsLocked) {
             if (matchClickRegroup()) {
                 BH.WBP.loopCount++;
@@ -270,7 +270,6 @@
             return;
         }
 
-        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
