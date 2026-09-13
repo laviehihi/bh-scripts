@@ -16,6 +16,8 @@
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/help.js
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/marker.js
 // @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.1/ui/addmode.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@main/wb-party.js
+
 // ==/UserScript==
 
 (function () {
