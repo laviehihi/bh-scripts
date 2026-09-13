@@ -12,7 +12,7 @@
     // =========================================================
 
     BH.WBP.config = {
-        // 5 slot đếm số người (tọa độ CSS)
+        // 5 slot (TỌA ĐỘ BUFFER)
         slots: [
             { x: 140, y: 416, label: 'Slot 1', disabled: false },
             { x: 140, y: 358, label: 'Slot 2', disabled: false },
@@ -25,25 +25,23 @@
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút (tọa độ CSS)
+        // Nút (TỌA ĐỘ BUFFER)
         readyStart: { x: 390, y: 70, hex: '#1267d3', tol: 15, label: 'Ready/Start' },
         yes: { x: 362, y: 206, hex: '#9cd01f', tol: 15, label: 'Yes' },
         regroup: { x: 592, y: 54, hex: '#9cd01f', tol: 15, label: 'Regroup' },
 
-        // 3 điểm confirm (dự phòng)
+        // 3 điểm confirm (TỌA ĐỘ BUFFER)
         confirmPoints: [
             { x: 324, y: 500, hex: '#333d4b', tol: 15 },
             { x: 384, y: 502, hex: '#37414d', tol: 15 },
             { x: 546, y: 502, hex: '#37414f', tol: 15 }
         ],
 
-        // Timing
         yesCheckDelay: 2000,
         regroupTimeout: 120000,
         pollInterval: 500,
         watchdogTimeout: 3 * 60 * 1000,
 
-        // Chế độ
         modes: {
             z: 2,
             x: 3,
@@ -51,7 +49,6 @@
             v: 5
         },
 
-        // Debug: hiện điểm sáng tại slot đang check
         showDebugMarkers: true
     };
 
@@ -73,20 +70,14 @@
     BH.WBP.watchdogPaused = false;
 
     // =========================================================
-    // UTILS
+    // ĐỌC PIXEL THEO BUFFER
     // =========================================================
 
-    // Convert CSS → buffer pixel, rồi đọc
-    function readPixelCSS(cssX, cssY) {
+    function readPixelBuf(bufX, bufY) {
         const canvas = BH.getCanvas();
         if (!canvas) return null;
         const gl = BH.getGL(canvas);
         if (!gl) return null;
-
-        const rect = canvas.getBoundingClientRect();
-        const bufX = Math.round(cssX * canvas.width / rect.width);
-        const bufY = Math.round(cssY * canvas.height / rect.height);
-
         return BH.readPixel(gl, bufX, bufY);
     }
 
@@ -125,8 +116,8 @@
         }
     }
 
-    // Vẽ vòng tròn tại vị trí CSS
-    function drawDebugMarker(cssX, cssY, color, label) {
+    // Vẽ marker: truyền tọa độ BUFFER, tự convert sang CSS để vẽ
+    function drawDebugMarker(bufX, bufY, color, label) {
         if (!BH.WBP.config.showDebugMarkers) return;
 
         ensureDebugLayer();
@@ -135,8 +126,8 @@
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        const clientX = rect.left + cssX;
-        const clientY = rect.top + cssY;
+        const clientX = rect.left + bufX * rect.width / canvas.width;
+        const clientY = rect.top + bufY * rect.height / canvas.height;
 
         const dot = document.createElement('div');
         Object.assign(dot.style, {
@@ -190,7 +181,7 @@
 
         for (let i = 0; i < cfg.slots.length; i++) {
             const slot = cfg.slots[i];
-            const pixel = readPixelCSS(slot.x, slot.y);
+            const pixel = readPixelBuf(slot.x, slot.y);
 
             if (!pixel) {
                 drawDebugMarker(slot.x, slot.y, '#666666', `${i + 1}:ERR`);
@@ -199,13 +190,11 @@
 
             const hex = BH.rgbToHex(pixel);
 
-            // Slot trống?
             if (matchHex(pixel, cfg.emptyHex, cfg.tol)) {
                 drawDebugMarker(slot.x, slot.y, '#ffcc00', `${i + 1}:empty`);
                 continue;
             }
 
-            // Slot 4/5 có thể disabled
             if (slot.disabled) {
                 if (matchHex(pixel, cfg.disabledHex, cfg.tol)) {
                     drawDebugMarker(slot.x, slot.y, '#888888', `${i + 1}:dis`);
@@ -213,7 +202,6 @@
                 }
             }
 
-            // Slot có người
             drawDebugMarker(slot.x, slot.y, '#00ff88', `${i + 1}:${hex}`);
             count++;
         }
@@ -230,7 +218,7 @@
 
         for (let i = 0; i < cfg.confirmPoints.length; i++) {
             const p = cfg.confirmPoints[i];
-            const pixel = readPixelCSS(p.x, p.y);
+            const pixel = readPixelBuf(p.x, p.y);
             if (!pixel) continue;
 
             if (matchHex(pixel, p.hex, p.tol)) {
@@ -245,16 +233,16 @@
     // CLICK
     // =========================================================
 
-    function clickAt(step) {
+    function clickAtBuf(bufX, bufY) {
         if (BH.WBP.isClicking) return false;
 
         const canvas = BH.getCanvas();
         if (!canvas) return false;
 
-        // Convert CSS → client
+        // Convert buffer → client
         const rect = canvas.getBoundingClientRect();
-        const clientX = rect.left + step.x;
-        const clientY = rect.top + step.y;
+        const clientX = rect.left + bufX * rect.width / canvas.width;
+        const clientY = rect.top + bufY * rect.height / canvas.height;
 
         if (clientX < rect.left || clientX > rect.right) return false;
         if (clientY < rect.top || clientY > rect.bottom) return false;
@@ -274,9 +262,9 @@
     }
 
     function matchClick(step) {
-        const pixel = readPixelCSS(step.x, step.y);
+        const pixel = readPixelBuf(step.x, step.y);
         if (!matchHex(pixel, step.hex, step.tol)) return false;
-        return clickAt(step);
+        return clickAtBuf(step.x, step.y);
     }
 
     function setMsg(msg) {
@@ -294,7 +282,6 @@
 
         const cfg = BH.WBP.config;
 
-        // Watchdog
         if (!BH.WBP.watchdogPaused) {
             if (checkConfirm()) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
@@ -308,7 +295,6 @@
             }
         }
 
-        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -318,7 +304,6 @@
             return;
         }
 
-        // Đủ người → Start
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
         if (!matchClick(cfg.readyStart)) {
