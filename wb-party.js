@@ -8,40 +8,42 @@
     BH.WBP = BH.WBP || {};
 
     // =========================================================
-    // CONFIG
+    // CONFIG — TỌA ĐỘ BUFFER
     // =========================================================
 
     BH.WBP.config = {
-        // 5 slot (TỌA ĐỘ BUFFER)
+        // 5 slot đếm số người
         slots: [
-            { x: 140, y: 416, label: 'Slot 1', disabled: false },
-            { x: 140, y: 358, label: 'Slot 2', disabled: false },
-            { x: 140, y: 292, label: 'Slot 3', disabled: false },
-            { x: 140, y: 220, label: 'Slot 4', disabled: true },
-            { x: 140, y: 166, label: 'Slot 5', disabled: true }
+            { x: 142, y: 420, label: 'Slot 1', disabled: false },
+            { x: 138, y: 354, label: 'Slot 2', disabled: false },
+            { x: 136, y: 290, label: 'Slot 3', disabled: false },
+            { x: 138, y: 216, label: 'Slot 4', disabled: true },
+            { x: 146, y: 164, label: 'Slot 5', disabled: true }
         ],
 
         emptyHex: '#282f37',
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút (TỌA ĐỘ BUFFER)
-        readyStart: { x: 390, y: 70, hex: '#1267d3', tol: 15, label: 'Ready/Start' },
-        yes: { x: 362, y: 206, hex: '#9cd01f', tol: 15, label: 'Yes' },
-        regroup: { x: 592, y: 54, hex: '#9cd01f', tol: 15, label: 'Regroup' },
+        // Nút
+        readyStart: { x: 398, y: 66, hex: '#1978ef', tol: 15, label: 'Ready/Start' },
+        yes: { x: 454, y: 210, hex: '#a6d399', tol: 15, label: 'Yes' },
+        regroup: { x: 444, y: 60, hex: '#a6d399', tol: 15, label: 'Regroup' },
 
-        // 3 điểm confirm (TỌA ĐỘ BUFFER)
+        // 3 điểm confirm (màu có thể là 37414d HOẶC 37414f)
         confirmPoints: [
-            { x: 324, y: 500, hex: '#333d4b', tol: 15 },
-            { x: 384, y: 502, hex: '#37414d', tol: 15 },
-            { x: 546, y: 502, hex: '#37414f', tol: 15 }
+            { x: 304, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 },
+            { x: 390, y: 510, hexes: ['#37414d', '#37414f'], tol: 15 },
+            { x: 556, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 }
         ],
 
+        // Timing
         yesCheckDelay: 2000,
         regroupTimeout: 120000,
         pollInterval: 500,
         watchdogTimeout: 3 * 60 * 1000,
 
+        // Chế độ
         modes: {
             z: 2,
             x: 3,
@@ -70,7 +72,7 @@
     BH.WBP.watchdogPaused = false;
 
     // =========================================================
-    // ĐỌC PIXEL THEO BUFFER
+    // ĐỌC PIXEL (BUFFER)
     // =========================================================
 
     function readPixelBuf(bufX, bufY) {
@@ -85,6 +87,15 @@
         if (!pixel) return false;
         const target = BH.hexToRgb(hex);
         return BH.colorMatch(pixel, target, tol || 15);
+    }
+
+    // Match với nhiều màu (VD: confirm có 2 màu)
+    function matchAnyHex(pixel, hexes, tol) {
+        if (!pixel) return false;
+        for (let i = 0; i < hexes.length; i++) {
+            if (matchHex(pixel, hexes[i], tol)) return true;
+        }
+        return false;
     }
 
     // =========================================================
@@ -116,7 +127,7 @@
         }
     }
 
-    // Vẽ marker: truyền tọa độ BUFFER, tự convert sang CSS để vẽ
+    // Vẽ marker — tọa độ BUFFER → CSS để hiện
     function drawDebugMarker(bufX, bufY, color, label) {
         if (!BH.WBP.config.showDebugMarkers) return;
 
@@ -221,7 +232,7 @@
             const pixel = readPixelBuf(p.x, p.y);
             if (!pixel) continue;
 
-            if (matchHex(pixel, p.hex, p.tol)) {
+            if (matchAnyHex(pixel, p.hexes, p.tol)) {
                 return true;
             }
         }
@@ -282,6 +293,7 @@
 
         const cfg = BH.WBP.config;
 
+        // Watchdog
         if (!BH.WBP.watchdogPaused) {
             if (checkConfirm()) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
@@ -295,6 +307,7 @@
             }
         }
 
+        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -304,6 +317,7 @@
             return;
         }
 
+        // Đủ người → Start
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
         if (!matchClick(cfg.readyStart)) {
