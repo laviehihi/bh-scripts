@@ -33,6 +33,34 @@
     BH.onAddModeChange = null;
 
     // =========================================================
+    // LOCALSTORAGE — LƯU RULES
+    // =========================================================
+
+    const STORAGE_KEY = 'bh_script_rules_v1';
+
+    BH.loadRules = function () {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                BH.rules = parsed;
+            }
+        } catch (e) {
+            console.warn('[BH] load rules fail:', e);
+        }
+    };
+
+    BH.saveRules = function () {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(BH.rules));
+        } catch (e) {
+            console.warn('[BH] save rules fail:', e);
+        }
+    };
+
+    // =========================================================
     // CLICK
     // =========================================================
 
@@ -358,6 +386,8 @@
             enabled: true
         });
 
+        BH.saveRules();   // ← LƯU
+
         if (BH.onPendingMarker) {
             BH.onPendingMarker(buf.x, buf.y);
         }
@@ -401,6 +431,8 @@
 
         lastRule.hex = hex;
 
+        BH.saveRules();   // ← LƯU
+
         if (BH.onRemovePendingMarker) {
             BH.onRemovePendingMarker();
         }
@@ -415,6 +447,8 @@
         }
 
         const removed = BH.rules.pop();
+
+        BH.saveRules();   // ← LƯU
 
         if (removed.hex === null && BH.onRemovePendingMarker) {
             BH.onRemovePendingMarker();

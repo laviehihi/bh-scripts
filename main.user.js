@@ -1,38 +1,26 @@
 // ==UserScript==
-// @name         Bit Heroes - Auto Click + Speed Hack (Modular)
+// @name         Bit Heroes - Auto Click + Speed Hack (Merged)
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  1 help, 2 overlay, 3 rerun, 4 wb, 5 script, 6 add rule.
+// @version      10.1
+// @description  1 help, 2 overlay, 3 rerun, 4 wb, 5 script, 6 add rule, 7 WB Team.
 // @match        *://*.kongregate.com/*
 // @match        *://*.bitheroesgame.com/*
 // @run-at       document-start
 // @grant        none
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/utils.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/rules.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/pixel.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/speed-hack.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/engine.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/overlay.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/help.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/marker.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/addmode.js
-// @require https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/wb-party.js
-
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/utils.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/rules.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/pixel.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/speed-hack.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/core/engine.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/overlay.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/help.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/marker.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/ui/addmode.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.14/wb-party.js
 // ==/UserScript==
 
 (function () {
     'use strict';
-
-    // =========================================================
-    // WAIT FOR BH NAMESPACE
-    // =========================================================
-
-    if (typeof window.__BH__ === 'undefined') {
-        console.error('[Bit Heroes] BH namespace chưa load — kiểm tra @require URLs');
-        return;
-    }
-
-    const BH = window.__BH__;
 
     // =========================================================
     // FIX: ÉP TAB LUÔN VISIBLE + FOCUSED
@@ -98,13 +86,22 @@
     // =========================================================
 
     function init() {
-        BH.render();
+        // Load rules đã lưu từ localStorage
+        if (window.__BH__ && window.__BH__.loadRules) {
+            window.__BH__.loadRules();
+        }
+
+        if (window.__BH__ && window.__BH__.render) {
+            window.__BH__.render();
+        }
 
         setInterval(function () {
-            BH.render();
+            if (window.__BH__ && window.__BH__.render) {
+                window.__BH__.render();
+            }
         }, 500);
 
-        console.log('[Bit Heroes] Auto loaded. Bấm 1 để xem help.');
+        console.log('[Bit Heroes] Auto loaded.');
     }
 
     if (document.readyState === 'loading') {
@@ -114,7 +111,7 @@
     }
 
     // =========================================================
-    // HOTKEY
+    // HOTKEY (nếu bạn có ở đây — giữ nguyên)
     // =========================================================
 
     document.addEventListener(
@@ -124,77 +121,81 @@
             if (e.key === '1') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.toggleHelp();
+                if (window.__BH__.toggleHelp) window.__BH__.toggleHelp();
                 return;
             }
 
             if (e.key === '2') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.cycleOverlay();
+                if (window.__BH__.cycleOverlay) window.__BH__.cycleOverlay();
                 return;
             }
 
             if (e.key === '3') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.toggleRerun();
+                if (window.__BH__.toggleRerun) window.__BH__.toggleRerun();
                 return;
             }
 
             if (e.key === '4') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.toggleWB();
+                if (window.__BH__.toggleWB) window.__BH__.toggleWB();
                 return;
             }
 
             if (e.key === '5') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.toggleScript();
+                if (window.__BH__.toggleScript) window.__BH__.toggleScript();
                 return;
             }
 
             if (e.key === '6') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.toggleAddMode();
+                if (window.__BH__.toggleAddMode) window.__BH__.toggleAddMode();
                 return;
             }
 
-            if (e.key === '0' && BH.isAddingRule) {
+            if (e.key === '0' && window.__BH__.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.saveRulePositionAtCursor();
+                if (window.__BH__.saveRulePositionAtCursor) window.__BH__.saveRulePositionAtCursor();
                 return;
             }
 
-            if (e.key === '9' && BH.isAddingRule) {
+            if (e.key === '9' && window.__BH__.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.saveRuleColor();
+                if (window.__BH__.saveRuleColor) window.__BH__.saveRuleColor();
                 return;
             }
 
-            if (e.key === '8' && BH.isAddingRule) {
+            if (e.key === '8' && window.__BH__.isAddingRule) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.deleteLastRule();
+                if (window.__BH__.deleteLastRule) window.__BH__.deleteLastRule();
                 return;
             }
 
             if (e.key === '=' || e.key === '+') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.setSpeed(BH.getSpeed() + 1);
+                if (window.__BH__.setSpeed) {
+                    window.__BH__.setSpeed(window.__BH__.getSpeed() + 1);
+                }
                 return;
             }
 
             if (e.key === '-') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                BH.setSpeed(BH.getSpeed() - 1);
+                if (window.__BH__.setSpeed) {
+                    window.__BH__.setSpeed(window.__BH__.getSpeed() - 1);
+                }
                 return;
             }
         },
