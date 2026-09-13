@@ -26,7 +26,13 @@
 
         readyStart: { x: 388, y: 66, hexes: ['#0a62d0', '#1fabd0'], tol: 15, label: 'Ready/Start' },
         yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
-        regroup: { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup' },
+
+        // Regroup — 3 vị trí (match 1 trong 3 là click)
+        regroupPoints: [
+            { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup 1' },
+            { x: 442, y: 50, hex: '#9cd01f', tol: 15, label: 'Regroup 2' },
+            { x: 594, y: 40, hex: '#89b516', tol: 15, label: 'Regroup 3' }
+        ],
 
         confirmPoints: [
             { x: 304, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 },
@@ -64,7 +70,7 @@
     BH.WBP.isClicking = false;
     BH.WBP.watchdogPaused = false;
     BH.WBP.slotsLocked = false;
-    BH.WBP.confirmOk = false;       // ← MỚI
+    BH.WBP.confirmOk = false;
 
     // =========================================================
     // ĐỌC PIXEL
@@ -160,6 +166,11 @@
 
         BH.dispatchFullClick(canvas, pos.clientX, pos.clientY);
 
+        // Click flash effect
+        if (BH.showClickFlash) {
+            BH.showClickFlash(pos.clientX, pos.clientY);
+        }
+
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
 
@@ -186,6 +197,23 @@
         return clickAtBuf(step.x, step.y);
     }
 
+    // Regroup — match 1 trong 3 vị trí
+    function matchClickRegroup() {
+        const cfg = BH.WBP.config;
+
+        for (let i = 0; i < cfg.regroupPoints.length; i++) {
+            const step = cfg.regroupPoints[i];
+            const pixel = readPixelBuf(step.x, step.y);
+            if (!pixel) continue;
+
+            if (matchHex(pixel, step.hex, step.tol)) {
+                return clickAtBuf(step.x, step.y);
+            }
+        }
+
+        return false;
+    }
+
     function setMsg(msg) {
         BH.WBP.lastMsg = msg;
         if (BH.render) BH.render();
@@ -201,9 +229,7 @@
 
         const cfg = BH.WBP.config;
 
-        // =========================================================
-        // WATCHDOG + CHECK CONFIRM
-        // =========================================================
+        // Watchdog + confirm
         const confirmed = checkConfirm();
         BH.WBP.confirmOk = confirmed;
 
@@ -220,18 +246,16 @@
             }
         }
 
-        // Nếu chưa ở màn WB → không làm gì
+        // Chưa vào màn WB → chờ
         if (!confirmed && !BH.WBP.slotsLocked) {
             setMsg('Chưa vào màn WB — chờ');
             if (BH.render) BH.render();
             return;
         }
 
-        // =========================================================
-        // NẾU slotsLocked → BỎ QUA ĐẾM SLOT, CHỈ CHECK REGROUP
-        // =========================================================
+        // Đang trong trận → chỉ check Regroup
         if (BH.WBP.slotsLocked) {
-            if (matchClick(cfg.regroup)) {
+            if (matchClickRegroup()) {
                 BH.WBP.loopCount++;
                 setMsg(`✓ Vòng ${BH.WBP.loopCount} xong`);
 
@@ -246,9 +270,7 @@
             return;
         }
 
-        // =========================================================
-        // ĐẾM SLOT (đã confirm ở màn WB)
-        // =========================================================
+        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
