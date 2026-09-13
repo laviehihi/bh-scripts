@@ -8,7 +8,7 @@
     BH.WBP = BH.WBP || {};
 
     // =========================================================
-    // CONFIG — TỌA ĐỘ BUFFER
+    // CONFIG
     // =========================================================
 
     BH.WBP.config = {
@@ -21,16 +21,17 @@
             { x: 516, y: 156, label: 'Slot 5', disabled: true }
         ],
 
-        emptyHex: '#ffffff',
+        // Màu trống — nhiều màu tùy role (leader/member)
+        emptyHexes: ['#ffffff', '#8ea5c2'],
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút — lấy từ WB Solo
+        // Nút
         readyStart: { x: 388, y: 66, hex: '#0a62d0', tol: 15, label: 'Ready/Start' },
         yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
         regroup: { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup' },
 
-        // 3 điểm confirm (giữ tọa độ cũ)
+        // 3 điểm confirm
         confirmPoints: [
             { x: 304, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 },
             { x: 390, y: 510, hexes: ['#37414d', '#37414f'], tol: 15 },
@@ -197,7 +198,7 @@
 
             const hex = BH.rgbToHex(pixel);
 
-            if (matchHex(pixel, cfg.emptyHex, cfg.tol)) {
+            if (matchAnyHex(pixel, cfg.emptyHexes, cfg.tol)) {
                 drawDebugMarker(slot.x, slot.y, '#ffcc00', `${i + 1}:empty`);
                 continue;
             }
