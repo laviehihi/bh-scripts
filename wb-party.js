@@ -63,7 +63,8 @@
     BH.WBP.lastConfirmTime = 0;
     BH.WBP.isClicking = false;
     BH.WBP.watchdogPaused = false;
-    BH.WBP.slotsLocked = false;      // ← MỚI
+    BH.WBP.slotsLocked = false;
+    BH.WBP.confirmOk = false;       // ← MỚI
 
     // =========================================================
     // ĐỌC PIXEL
@@ -200,9 +201,14 @@
 
         const cfg = BH.WBP.config;
 
-        // Watchdog
+        // =========================================================
+        // WATCHDOG + CHECK CONFIRM
+        // =========================================================
+        const confirmed = checkConfirm();
+        BH.WBP.confirmOk = confirmed;
+
         if (!BH.WBP.watchdogPaused) {
-            if (checkConfirm()) {
+            if (confirmed) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
             } else {
                 const idle = BH.originalDateNow() - BH.WBP.lastConfirmTime;
@@ -214,18 +220,24 @@
             }
         }
 
+        // Nếu chưa ở màn WB → không làm gì
+        if (!confirmed && !BH.WBP.slotsLocked) {
+            setMsg('Chưa vào màn WB — chờ');
+            if (BH.render) BH.render();
+            return;
+        }
+
         // =========================================================
-        // NẾU slotsLocked → BỎ QUA ĐẾM SLOT
+        // NẾU slotsLocked → BỎ QUA ĐẾM SLOT, CHỈ CHECK REGROUP
         // =========================================================
         if (BH.WBP.slotsLocked) {
-            // Chỉ check Regroup
             if (matchClick(cfg.regroup)) {
                 BH.WBP.loopCount++;
                 setMsg(`✓ Vòng ${BH.WBP.loopCount} xong`);
 
                 BH.WBP.watchdogPaused = false;
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
-                BH.WBP.slotsLocked = false;    // ← UNLOCK
+                BH.WBP.slotsLocked = false;
 
                 BH.originalSetTimeout(function () {
                     if (BH.WBP.running && BH.render) BH.render();
@@ -235,7 +247,7 @@
         }
 
         // =========================================================
-        // ĐẾM SLOT (chỉ khi chưa lock)
+        // ĐẾM SLOT (đã confirm ở màn WB)
         // =========================================================
         const count = countSlots();
         BH.WBP.currentCount = count;
@@ -254,7 +266,7 @@
 
         setMsg('Đã bấm Ready/Start');
         BH.WBP.watchdogPaused = true;
-        BH.WBP.slotsLocked = true;    // ← LOCK
+        BH.WBP.slotsLocked = true;
 
         BH.originalSetTimeout(function () {
             if (!BH.WBP.running) return;
@@ -262,8 +274,6 @@
             if (matchClick(cfg.yes)) {
                 setMsg('Đã bấm Yes (thiếu member)');
             }
-
-            // slotsLocked đã = true → tick() sẽ chỉ check Regroup
         }, cfg.yesCheckDelay);
     }
 
@@ -282,9 +292,10 @@
         BH.WBP.lastActionTime = BH.originalDateNow();
         BH.WBP.lastConfirmTime = BH.originalDateNow();
         BH.WBP.watchdogPaused = false;
-        BH.WBP.slotsLocked = false;    // ← reset
+        BH.WBP.slotsLocked = false;
+        BH.WBP.confirmOk = false;
 
-        setMsg('WB Party started');
+        setMsg('WB Party started — chờ vào màn WB');
 
         BH.WBP.timerId = BH.originalSetInterval(tick, BH.WBP.config.pollInterval);
 
