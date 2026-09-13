@@ -20,24 +20,20 @@
             { x: 516, y: 156, label: 'Slot 5', disabled: true }
         ],
 
-        // Màu slot trống
         emptyHexes: ['#ffffff', '#8ea5c2'],
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút — Ready/Start có 2 màu
         readyStart: { x: 388, y: 66, hexes: ['#0a62d0', '#1fabd0'], tol: 15, label: 'Ready/Start' },
         yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
         regroup: { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup' },
 
-        // 3 điểm confirm
         confirmPoints: [
             { x: 304, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 },
             { x: 390, y: 510, hexes: ['#37414d', '#37414f'], tol: 15 },
             { x: 556, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 }
         ],
 
-        // Timing
         yesCheckDelay: 2000,
         regroupTimeout: 120000,
         pollInterval: 500,
@@ -48,9 +44,7 @@
             x: 3,
             c: 4,
             v: 5
-        },
-
-        showDebugMarkers: true
+        }
     };
 
     // =========================================================
@@ -69,9 +63,10 @@
     BH.WBP.lastConfirmTime = 0;
     BH.WBP.isClicking = false;
     BH.WBP.watchdogPaused = false;
+    BH.WBP.slotsLocked = false;      // ← MỚI
 
     // =========================================================
-    // ĐỌC PIXEL — BUFFER
+    // ĐỌC PIXEL
     // =========================================================
 
     function readPixelBuf(bufX, bufY) {
@@ -97,85 +92,6 @@
     }
 
     // =========================================================
-    // DEBUG MARKERS
-    // =========================================================
-
-    let debugLayer = null;
-
-    function ensureDebugLayer() {
-        if (debugLayer) return;
-
-        debugLayer = document.createElement('div');
-        Object.assign(debugLayer.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: '2147483646'
-        });
-
-        (document.documentElement || document.body).appendChild(debugLayer);
-    }
-
-    function clearDebugMarkers() {
-        if (debugLayer) {
-            debugLayer.innerHTML = '';
-        }
-    }
-
-    function drawDebugMarker(bufX, bufY, color, label) {
-        if (!BH.WBP.config.showDebugMarkers) return;
-
-        ensureDebugLayer();
-
-        const canvas = BH.getCanvas();
-        if (!canvas) return;
-
-        const pos = BH.bufferToClient(canvas, bufX, bufY);
-
-        const dot = document.createElement('div');
-        Object.assign(dot.style, {
-            position: 'fixed',
-            left: `${pos.clientX}px`,
-            top: `${pos.clientY}px`,
-            width: '14px',
-            height: '14px',
-            transform: 'translate(-50%, -50%)',
-            border: `2px solid ${color}`,
-            borderRadius: '50%',
-            boxShadow: `0 0 6px ${color}, 0 0 12px ${color}`,
-            pointerEvents: 'none',
-            zIndex: '2147483647'
-        });
-
-        debugLayer.appendChild(dot);
-
-        if (label) {
-            const lbl = document.createElement('div');
-            Object.assign(lbl.style, {
-                position: 'fixed',
-                left: `${pos.clientX}px`,
-                top: `${pos.clientY + 14}px`,
-                transform: 'translateX(-50%)',
-                padding: '1px 4px',
-                background: 'rgba(0,0,0,0.8)',
-                color: color,
-                fontSize: '8px',
-                fontFamily: 'Consolas, monospace',
-                fontWeight: '700',
-                borderRadius: '2px',
-                pointerEvents: 'none',
-                zIndex: '2147483647',
-                whiteSpace: 'nowrap'
-            });
-            lbl.textContent = label;
-            debugLayer.appendChild(lbl);
-        }
-    }
-
-    // =========================================================
     // COUNT SLOTS
     // =========================================================
 
@@ -183,32 +99,18 @@
         let count = 0;
         const cfg = BH.WBP.config;
 
-        clearDebugMarkers();
-
         for (let i = 0; i < cfg.slots.length; i++) {
             const slot = cfg.slots[i];
             const pixel = readPixelBuf(slot.x, slot.y);
 
-            if (!pixel) {
-                drawDebugMarker(slot.x, slot.y, '#666666', `${i + 1}:ERR`);
-                continue;
-            }
+            if (!pixel) continue;
 
-            const hex = BH.rgbToHex(pixel);
-
-            if (matchAnyHex(pixel, cfg.emptyHexes, cfg.tol)) {
-                drawDebugMarker(slot.x, slot.y, '#ffcc00', `${i + 1}:empty`);
-                continue;
-            }
+            if (matchAnyHex(pixel, cfg.emptyHexes, cfg.tol)) continue;
 
             if (slot.disabled) {
-                if (matchHex(pixel, cfg.disabledHex, cfg.tol)) {
-                    drawDebugMarker(slot.x, slot.y, '#888888', `${i + 1}:dis`);
-                    continue;
-                }
+                if (matchHex(pixel, cfg.disabledHex, cfg.tol)) continue;
             }
 
-            drawDebugMarker(slot.x, slot.y, '#00ff88', `${i + 1}:${hex}`);
             count++;
         }
 
@@ -267,7 +169,6 @@
         return true;
     }
 
-    // Sửa: hỗ trợ cả hex (1 màu) và hexes (nhiều màu)
     function matchClick(step) {
         const pixel = readPixelBuf(step.x, step.y);
         if (!pixel) return false;
@@ -299,6 +200,7 @@
 
         const cfg = BH.WBP.config;
 
+        // Watchdog
         if (!BH.WBP.watchdogPaused) {
             if (checkConfirm()) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
@@ -312,6 +214,29 @@
             }
         }
 
+        // =========================================================
+        // NẾU slotsLocked → BỎ QUA ĐẾM SLOT
+        // =========================================================
+        if (BH.WBP.slotsLocked) {
+            // Chỉ check Regroup
+            if (matchClick(cfg.regroup)) {
+                BH.WBP.loopCount++;
+                setMsg(`✓ Vòng ${BH.WBP.loopCount} xong`);
+
+                BH.WBP.watchdogPaused = false;
+                BH.WBP.lastConfirmTime = BH.originalDateNow();
+                BH.WBP.slotsLocked = false;    // ← UNLOCK
+
+                BH.originalSetTimeout(function () {
+                    if (BH.WBP.running && BH.render) BH.render();
+                }, 1000);
+            }
+            return;
+        }
+
+        // =========================================================
+        // ĐẾM SLOT (chỉ khi chưa lock)
+        // =========================================================
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -329,6 +254,7 @@
 
         setMsg('Đã bấm Ready/Start');
         BH.WBP.watchdogPaused = true;
+        BH.WBP.slotsLocked = true;    // ← LOCK
 
         BH.originalSetTimeout(function () {
             if (!BH.WBP.running) return;
@@ -337,43 +263,8 @@
                 setMsg('Đã bấm Yes (thiếu member)');
             }
 
-            waitForRegroup();
+            // slotsLocked đã = true → tick() sẽ chỉ check Regroup
         }, cfg.yesCheckDelay);
-    }
-
-    function waitForRegroup() {
-        if (!BH.WBP.running) return;
-
-        const cfg = BH.WBP.config;
-        const startTime = BH.originalDateNow();
-
-        const checkRegroup = function () {
-            if (!BH.WBP.running) return;
-
-            if (matchClick(cfg.regroup)) {
-                BH.WBP.loopCount++;
-                setMsg(`✓ Vòng ${BH.WBP.loopCount} xong`);
-
-                BH.WBP.watchdogPaused = false;
-                BH.WBP.lastConfirmTime = BH.originalDateNow();
-
-                BH.originalSetTimeout(function () {
-                    if (BH.WBP.running && BH.render) BH.render();
-                }, 1000);
-                return;
-            }
-
-            if (BH.originalDateNow() - startTime > cfg.regroupTimeout) {
-                setMsg('⚠ Timeout chờ Regroup');
-                BH.WBP.watchdogPaused = false;
-                BH.WBP.lastConfirmTime = BH.originalDateNow();
-                return;
-            }
-
-            BH.originalSetTimeout(checkRegroup, 1000);
-        };
-
-        checkRegroup();
     }
 
     // =========================================================
@@ -391,6 +282,7 @@
         BH.WBP.lastActionTime = BH.originalDateNow();
         BH.WBP.lastConfirmTime = BH.originalDateNow();
         BH.WBP.watchdogPaused = false;
+        BH.WBP.slotsLocked = false;    // ← reset
 
         setMsg('WB Party started');
 
@@ -408,8 +300,6 @@
             BH.originalClearInterval(BH.WBP.timerId);
             BH.WBP.timerId = null;
         }
-
-        clearDebugMarkers();
 
         if (BH.render) BH.render();
     }
