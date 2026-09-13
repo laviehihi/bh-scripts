@@ -71,16 +71,6 @@ Tùy vào phiên bản trình duyệt, bạn cần bật **1 trong 2** tùy ch�
 
 ---
 
-### Bước 4: Kiểm tra
-
-1. Mở trang game.
-2. Đợi game load xong.
-3. Nhấn **F12** → tab **Console**.
-4. Tìm dòng log:
-5. Nếu thấy → **Thành công**.
-6. Nếu không → kiểm tra lại Bước 2 và Bước 3.
-
----
 
 ## ⚙️ Setup trước khi sử dụng bot
 
@@ -265,20 +255,3 @@ Trước khi setup bot, bạn **nên thu nhỏ cửa sổ game hết cỡ**.
 - Speed tối đa: **10×**.
 - Speed tối thiểu: **1×** (không hack).
 - **Không nên dùng speed quá cao** (> 5×) → có thể lag.
-
----
-
-## 🎨 Tuỳ chỉnh
-
-### Đổi phím tắt
-
-Mở `main.user.js` trong Tampermonkey editor → tìm `if (e.key === '3')` → sửa `'3'` thành phím khác.
-
-### Đổi tốc độ check
-
-Mở `core/rules.js`:
-
-```javascript
-BH.RERUN_HUNT_INTERVAL = 3000;   // 3 giây
-BH.WB_INTERVAL = 2000;           // 2 giây
-BH.SCRIPT_INTERVAL = 3000;       // 3 giây
