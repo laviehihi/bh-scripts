@@ -44,6 +44,9 @@
         pollInterval: 500,
         watchdogTimeout: 3 * 60 * 1000,
 
+        // Delay trước khi click (ms)
+        clickDelay: 1000,
+
         modes: {
             z: 2,
             x: 3,
@@ -70,6 +73,7 @@
     BH.WBP.watchdogPaused = false;
     BH.WBP.slotsLocked = false;
     BH.WBP.confirmOk = false;
+    BH.WBP.pendingClickStep = null;      // Step đang chờ click
 
     // =========================================================
     // ĐỌC PIXEL
@@ -172,7 +176,7 @@
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
 
-        // Reset hover — click góc canvas (giống WB Solo)
+        // Reset hover — click góc canvas
         BH.originalSetTimeout(function () {
             if (BH.resetHover) BH.resetHover();
         }, 100);
@@ -184,6 +188,7 @@
         return true;
     }
 
+    // Match + delay 1s trước khi click
     function matchClick(step) {
         const pixel = readPixelBuf(step.x, step.y);
         if (!pixel) return false;
@@ -197,10 +202,46 @@
         }
 
         if (!ok) return false;
-        return clickAtBuf(step.x, step.y);
+
+        // Nếu step này đang chờ click → kiểm tra đã đủ delay chưa
+        if (BH.WBP.pendingClickStep === step) {
+            return true;   // Đã chờ đủ, tick() sẽ click
+        }
+
+        // Bắt đầu chờ delay
+        BH.WBP.pendingClickStep = step;
+
+        BH.originalSetTimeout(function () {
+            if (!BH.WBP.running) return;
+            if (BH.WBP.pendingClickStep !== step) return;
+
+            // Vẫn check lại pixel trước khi click
+            const p2 = readPixelBuf(step.x, step.y);
+            if (!p2) {
+                BH.WBP.pendingClickStep = null;
+                return;
+            }
+
+            let stillOk = false;
+            if (step.hexes) {
+                stillOk = matchAnyHex(p2, step.hexes, step.tol);
+            } else if (step.hex) {
+                stillOk = matchHex(p2, step.hex, step.tol);
+            }
+
+            if (!stillOk) {
+                BH.WBP.pendingClickStep = null;
+                return;
+            }
+
+            clickAtBuf(step.x, step.y);
+            BH.WBP.pendingClickStep = null;
+        }, BH.WBP.config.clickDelay);
+
+        return false;   // Chưa click ngay
     }
 
-    // Regroup — match 1 trong 3 vị trí
+    // Regroup — match 1 trong 3 vị trí + delay
     function matchClickRegroup() {
         const cfg = BH.WBP.config;
 
@@ -210,7 +251,8 @@
             if (!pixel) continue;
 
             if (matchHex(pixel, step.hex, step.tol)) {
-                return clickAtBuf(step.x, step.y);
+                // Dùng chung logic delay với matchClick
+                return matchClick(step);
             }
         }
 
@@ -254,6 +296,7 @@
             return;
         }
 
+        // Đang trong trận → chỉ check Regroup
         if (BH.WBP.slotsLocked) {
             if (matchClickRegroup()) {
                 BH.WBP.loopCount++;
@@ -270,6 +313,7 @@
             return;
         }
 
+        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -281,7 +325,10 @@
 
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
-        if (!matchClick(cfg.readyStart)) {
+        // Match Ready/Start (có delay 1s)
+        const clicked = matchClick(cfg.readyStart);
+        if (!clicked) {
+            // Chưa click (đang chờ delay hoặc không match)
             return;
         }
 
@@ -315,6 +362,7 @@
         BH.WBP.watchdogPaused = false;
         BH.WBP.slotsLocked = false;
         BH.WBP.confirmOk = false;
+        BH.WBP.pendingClickStep = null;
 
         setMsg('WB Party started — chờ vào màn WB');
 
@@ -327,6 +375,7 @@
         if (!BH.WBP.running) return;
 
         BH.WBP.running = false;
+        BH.WBP.pendingClickStep = null;
 
         if (BH.WBP.timerId !== null) {
             BH.originalClearInterval(BH.WBP.timerId);
