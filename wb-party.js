@@ -12,7 +12,6 @@
     // =========================================================
 
     BH.WBP.config = {
-        // 5 slot đếm số người
         slots: [
             { x: 516, y: 436, label: 'Slot 1', disabled: false },
             { x: 516, y: 362, label: 'Slot 2', disabled: false },
@@ -21,13 +20,13 @@
             { x: 516, y: 156, label: 'Slot 5', disabled: true }
         ],
 
-        // Màu trống — nhiều màu tùy role (leader/member)
+        // Màu slot trống
         emptyHexes: ['#ffffff', '#8ea5c2'],
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút
-        readyStart: { x: 388, y: 66, hex: '#0a62d0', tol: 15, label: 'Ready/Start' },
+        // Nút — Ready/Start có 2 màu
+        readyStart: { x: 388, y: 66, hexes: ['#0a62d0', '#1fabd0'], tol: 15, label: 'Ready/Start' },
         yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
         regroup: { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup' },
 
@@ -44,7 +43,6 @@
         pollInterval: 500,
         watchdogTimeout: 3 * 60 * 1000,
 
-        // Chế độ
         modes: {
             z: 2,
             x: 3,
@@ -269,9 +267,20 @@
         return true;
     }
 
+    // Sửa: hỗ trợ cả hex (1 màu) và hexes (nhiều màu)
     function matchClick(step) {
         const pixel = readPixelBuf(step.x, step.y);
-        if (!matchHex(pixel, step.hex, step.tol)) return false;
+        if (!pixel) return false;
+
+        let ok = false;
+
+        if (step.hexes) {
+            ok = matchAnyHex(pixel, step.hexes, step.tol);
+        } else if (step.hex) {
+            ok = matchHex(pixel, step.hex, step.tol);
+        }
+
+        if (!ok) return false;
         return clickAtBuf(step.x, step.y);
     }
 
