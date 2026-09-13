@@ -14,23 +14,23 @@
     BH.WBP.config = {
         // 5 slot đếm số người
         slots: [
-            { x: 142, y: 420, label: 'Slot 1', disabled: false },
-            { x: 138, y: 354, label: 'Slot 2', disabled: false },
-            { x: 136, y: 290, label: 'Slot 3', disabled: false },
-            { x: 138, y: 216, label: 'Slot 4', disabled: true },
-            { x: 146, y: 164, label: 'Slot 5', disabled: true }
+            { x: 516, y: 436, label: 'Slot 1', disabled: false },
+            { x: 516, y: 362, label: 'Slot 2', disabled: false },
+            { x: 516, y: 300, label: 'Slot 3', disabled: false },
+            { x: 516, y: 228, label: 'Slot 4', disabled: true },
+            { x: 516, y: 156, label: 'Slot 5', disabled: true }
         ],
 
-        emptyHex: '#282f37',
+        emptyHex: '#ffffff',
         disabledHex: '#384250',
         tol: 15,
 
-        // Nút
-        readyStart: { x: 398, y: 66, hex: '#1978ef', tol: 15, label: 'Ready/Start' },
-        yes: { x: 454, y: 210, hex: '#a6d399', tol: 15, label: 'Yes' },
-        regroup: { x: 444, y: 60, hex: '#a6d399', tol: 15, label: 'Regroup' },
+        // Nút — lấy từ WB Solo
+        readyStart: { x: 388, y: 66, hex: '#0a62d0', tol: 15, label: 'Ready/Start' },
+        yes: { x: 356, y: 208, hex: '#9cd01f', tol: 15, label: 'Yes' },
+        regroup: { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup' },
 
-        // 3 điểm confirm (màu có thể là 37414d HOẶC 37414f)
+        // 3 điểm confirm (giữ tọa độ cũ)
         confirmPoints: [
             { x: 304, y: 504, hexes: ['#37414d', '#37414f'], tol: 15 },
             { x: 390, y: 510, hexes: ['#37414d', '#37414f'], tol: 15 },
@@ -72,7 +72,7 @@
     BH.WBP.watchdogPaused = false;
 
     // =========================================================
-    // ĐỌC PIXEL — ĐỌC THẲNG BUFFER (giống Rerun)
+    // ĐỌC PIXEL — BUFFER
     // =========================================================
 
     function readPixelBuf(bufX, bufY) {
@@ -126,7 +126,6 @@
         }
     }
 
-    // Vẽ marker — nhận tọa độ BUFFER, convert sang client để hiển thị
     function drawDebugMarker(bufX, bufY, color, label) {
         if (!BH.WBP.config.showDebugMarkers) return;
 
@@ -290,7 +289,6 @@
 
         const cfg = BH.WBP.config;
 
-        // Watchdog
         if (!BH.WBP.watchdogPaused) {
             if (checkConfirm()) {
                 BH.WBP.lastConfirmTime = BH.originalDateNow();
@@ -304,7 +302,6 @@
             }
         }
 
-        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -314,7 +311,6 @@
             return;
         }
 
-        // Đủ người → Start
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
         if (!matchClick(cfg.readyStart)) {
