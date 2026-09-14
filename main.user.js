@@ -7,16 +7,16 @@
 // @match        *://*.bitheroesgame.com/*
 // @run-at       document-start
 // @grant        none
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/core/utils.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/core/rules.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/core/pixel.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/core/speed-hack.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/core/engine.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/ui/overlay.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/ui/help.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/ui/marker.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/ui/addmode.js
-// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.18/wb-party.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/core/utils.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/core/rules.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/core/pixel.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/core/speed-hack.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/core/engine.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/ui/overlay.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/ui/help.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/ui/marker.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/ui/addmode.js
+// @require      https://cdn.jsdelivr.net/gh/laviehihi/bh-scripts@v1.0.19/wb-party.js
 // ==/UserScript==
 
 (function () {
