@@ -23,7 +23,7 @@
     BH.RESET_POINT_Y = 5;
 
     // =========================================================
-    // RULES CỐ ĐỊNH
+    // RERUN RULES (giữ nguyên)
     // =========================================================
 
     BH.RERUN_RULES = [
@@ -31,10 +31,37 @@
         { x: 410, y: 62, hex: '#cbf067', tol: BH.COLOR_TOLERANCE, enabled: true }
     ];
 
+    // =========================================================
+    // WB RULES — hỗ trợ nhiều điểm cho 1 rule
+    // =========================================================
+
     BH.WB_RULES = [
-        { x: 388, y: 66, hex: '#0a62d0', tol: BH.COLOR_TOLERANCE, enabled: true },
-        { x: 356, y: 208, hex: '#9cd01f', tol: BH.COLOR_TOLERANCE, enabled: true },
-        { x: 446, y: 58, hex: '#9cd01f', tol: BH.COLOR_TOLERANCE, enabled: true }
+        {
+            points: [{ x: 388, y: 66 }],
+            hex: '#0a62d0',
+            tol: BH.COLOR_TOLERANCE,
+            enabled: true,
+            label: 'Ready/Start'
+        },
+        {
+            points: [{ x: 356, y: 208 }],
+            hex: '#9cd01f',
+            tol: BH.COLOR_TOLERANCE,
+            enabled: true,
+            label: 'Yes'
+        },
+        {
+            points: [
+                { x: 446, y: 58 },
+                { x: 442, y: 50 },
+                { x: 594, y: 40, hex: '#89b516' },
+                { x: 492, y: 56 }
+            ],
+            hex: '#9cd01f',
+            tol: BH.COLOR_TOLERANCE,
+            enabled: true,
+            label: 'Regroup'
+        }
     ];
 
 })(window);

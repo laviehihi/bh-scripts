@@ -64,13 +64,14 @@
     // CLICK
     // =========================================================
 
-    BH.clickAtRule = function (canvas, rule) {
+    // Click theo tọa độ trực tiếp (dùng cho WB rules có nhiều points)
+    BH.clickAtBuf = function (canvas, bufX, bufY) {
         if (BH.isClicking) return false;
 
         const rect = canvas.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return false;
 
-        const pos = BH.bufferToClient(canvas, rule.x, rule.y);
+        const pos = BH.bufferToClient(canvas, bufX, bufY);
 
         if (pos.clientX < rect.left || pos.clientX > rect.right) return false;
         if (pos.clientY < rect.top || pos.clientY > rect.bottom) return false;
@@ -92,6 +93,11 @@
         }, 200);
 
         return true;
+    };
+
+    // Click theo rule (dùng cho script rules — rule có x, y)
+    BH.clickAtRule = function (canvas, rule) {
+        return BH.clickAtBuf(canvas, rule.x, rule.y);
     };
 
     // =========================================================
@@ -124,25 +130,32 @@
         BH.setMsg(`${time} • rerun no match`);
     };
 
+    // WB check — hỗ trợ nhiều points cho 1 rule
     BH.checkWB = function (canvas, gl, time) {
         for (let i = 0; i < BH.WB_RULES.length; i++) {
             const rule = BH.WB_RULES[i];
             if (!rule.enabled) continue;
 
-            const pixel = BH.readPixel(gl, rule.x, rule.y);
-            if (!pixel) continue;
+            // Duyệt qua tất cả points
+            for (let j = 0; j < rule.points.length; j++) {
+                const point = rule.points[j];
+                const pixel = BH.readPixel(gl, point.x, point.y);
+                if (!pixel) continue;
 
-            const target = BH.hexToRgb(rule.hex);
+                // Màu: point.hex ưu tiên, nếu không có thì dùng rule.hex
+                const hex = point.hex || rule.hex;
+                const target = BH.hexToRgb(hex);
 
-            if (BH.colorMatch(pixel, target, rule.tol)) {
-                const clicked = BH.clickAtRule(canvas, rule);
+                if (BH.colorMatch(pixel, target, rule.tol)) {
+                    const clicked = BH.clickAtBuf(canvas, point.x, point.y);
 
-                if (clicked) {
-                    BH.lastActionTime = BH.originalDateNow();
+                    if (clicked) {
+                        BH.lastActionTime = BH.originalDateNow();
+                    }
+
+                    BH.setMsg(`${time} • WB ${rule.label || 'R' + (i + 1)} → ${clicked ? 'CLICK' : 'BUSY'}`);
+                    return;
                 }
-
-                BH.setMsg(`${time} • WB R${i + 1} → ${clicked ? 'CLICK' : 'BUSY'}`);
-                return;
             }
         }
 
@@ -386,7 +399,7 @@
             enabled: true
         });
 
-        BH.saveRules();   // ← LƯU
+        BH.saveRules();
 
         if (BH.onPendingMarker) {
             BH.onPendingMarker(buf.x, buf.y);
@@ -431,7 +444,7 @@
 
         lastRule.hex = hex;
 
-        BH.saveRules();   // ← LƯU
+        BH.saveRules();
 
         if (BH.onRemovePendingMarker) {
             BH.onRemovePendingMarker();
@@ -448,7 +461,7 @@
 
         const removed = BH.rules.pop();
 
-        BH.saveRules();   // ← LƯU
+        BH.saveRules();
 
         if (removed.hex === null && BH.onRemovePendingMarker) {
             BH.onRemovePendingMarker();

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bit Heroes - Auto Click + Speed Hack (Merged)
 // @namespace    http://tampermonkey.net/
-// @version      10.1
+// @version      10.2
 // @description  1 help, 2 overlay, 3 rerun, 4 wb, 5 script, 6 add rule, 7 WB Team.
 // @match        *://*.kongregate.com/*
 // @match        *://*.bitheroesgame.com/*
@@ -111,7 +111,7 @@
     }
 
     // =========================================================
-    // HOTKEY (nếu bạn có ở đây — giữ nguyên)
+    // HOTKEY
     // =========================================================
 
     document.addEventListener(
@@ -125,10 +125,22 @@
                 return;
             }
 
+            // 2 = cycle overlay
+            // - Nếu WB Party đang chạy → cycle WB Party overlay
+            // - Ngược lại → cycle overlay thường
             if (e.key === '2') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                if (window.__BH__.cycleOverlay) window.__BH__.cycleOverlay();
+
+                if (window.__BH__.WBP && window.__BH__.WBP.running) {
+                    if (window.__BH__.WBP.cycleOverlay) {
+                        window.__BH__.WBP.cycleOverlay();
+                    }
+                } else {
+                    if (window.__BH__.cycleOverlay) {
+                        window.__BH__.cycleOverlay();
+                    }
+                }
                 return;
             }
 

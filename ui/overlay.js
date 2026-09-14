@@ -424,6 +424,12 @@
     function renderWbParty() {
         BH.ensureLogBox();
 
+        // Nếu overlay hidden → ẩn
+        if (BH.WBP.overlayState === 'hidden') {
+            BH.logBox.style.display = 'none';
+            return;
+        }
+
         BH.logBox.style.display = 'block';
         BH.logBox.style.width = '250px';
         BH.logBox.style.padding = '10px 12px';
@@ -449,7 +455,7 @@
                 <span style="color:#a6d339;font-size:12px;font-weight:700;">
                     🎮 WB TEAM
                 </span>
-                <span style="color:#666;font-size:9px;">7 = off</span>
+                <span style="color:#666;font-size:9px;">7 = off · 2 = ẩn</span>
             </div>
 
             <div style="

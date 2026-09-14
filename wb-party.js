@@ -30,7 +30,8 @@
         regroupPoints: [
             { x: 446, y: 58, hex: '#9cd01f', tol: 15, label: 'Regroup 1' },
             { x: 442, y: 50, hex: '#9cd01f', tol: 15, label: 'Regroup 2' },
-            { x: 594, y: 40, hex: '#89b516', tol: 15, label: 'Regroup 3' }
+            { x: 594, y: 40, hex: '#89b516', tol: 15, label: 'Regroup 3' },
+            { x: 492, y: 56, hex: '#9cd01f', tol: 15, label: 'Regroup 4' }
         ],
 
         confirmPoints: [
@@ -44,7 +45,6 @@
         pollInterval: 500,
         watchdogTimeout: 3 * 60 * 1000,
 
-        // Delay trước khi click (ms)
         clickDelay: 1000,
 
         modes: {
@@ -73,7 +73,10 @@
     BH.WBP.watchdogPaused = false;
     BH.WBP.slotsLocked = false;
     BH.WBP.confirmOk = false;
-    BH.WBP.pendingClickStep = null;      // Step đang chờ click
+    BH.WBP.pendingClickStep = null;
+
+    // Overlay: 'expanded' | 'hidden'
+    BH.WBP.overlayState = 'expanded';
 
     // =========================================================
     // ĐỌC PIXEL
@@ -176,7 +179,6 @@
         BH.WBP.totalClicks++;
         BH.WBP.lastActionTime = BH.originalDateNow();
 
-        // Reset hover — click góc canvas
         BH.originalSetTimeout(function () {
             if (BH.resetHover) BH.resetHover();
         }, 100);
@@ -188,7 +190,6 @@
         return true;
     }
 
-    // Match + delay 1s trước khi click
     function matchClick(step) {
         const pixel = readPixelBuf(step.x, step.y);
         if (!pixel) return false;
@@ -203,19 +204,16 @@
 
         if (!ok) return false;
 
-        // Nếu step này đang chờ click → kiểm tra đã đủ delay chưa
         if (BH.WBP.pendingClickStep === step) {
-            return true;   // Đã chờ đủ, tick() sẽ click
+            return true;
         }
 
-        // Bắt đầu chờ delay
         BH.WBP.pendingClickStep = step;
 
         BH.originalSetTimeout(function () {
             if (!BH.WBP.running) return;
             if (BH.WBP.pendingClickStep !== step) return;
 
-            // Vẫn check lại pixel trước khi click
             const p2 = readPixelBuf(step.x, step.y);
             if (!p2) {
                 BH.WBP.pendingClickStep = null;
@@ -238,10 +236,9 @@
             BH.WBP.pendingClickStep = null;
         }, BH.WBP.config.clickDelay);
 
-        return false;   // Chưa click ngay
+        return false;
     }
 
-    // Regroup — match 1 trong 3 vị trí + delay
     function matchClickRegroup() {
         const cfg = BH.WBP.config;
 
@@ -251,7 +248,6 @@
             if (!pixel) continue;
 
             if (matchHex(pixel, step.hex, step.tol)) {
-                // Dùng chung logic delay với matchClick
                 return matchClick(step);
             }
         }
@@ -296,7 +292,6 @@
             return;
         }
 
-        // Đang trong trận → chỉ check Regroup
         if (BH.WBP.slotsLocked) {
             if (matchClickRegroup()) {
                 BH.WBP.loopCount++;
@@ -313,7 +308,6 @@
             return;
         }
 
-        // Đếm slot
         const count = countSlots();
         BH.WBP.currentCount = count;
 
@@ -325,10 +319,8 @@
 
         setMsg(`Đủ người (${count}/${BH.WBP.modeCount}) → Start`);
 
-        // Match Ready/Start (có delay 1s)
         const clicked = matchClick(cfg.readyStart);
         if (!clicked) {
-            // Chưa click (đang chờ delay hoặc không match)
             return;
         }
 
@@ -363,6 +355,9 @@
         BH.WBP.slotsLocked = false;
         BH.WBP.confirmOk = false;
         BH.WBP.pendingClickStep = null;
+
+        // Reset overlay về expanded khi bật
+        BH.WBP.overlayState = 'expanded';
 
         setMsg('WB Party started — chờ vào màn WB');
 
@@ -399,6 +394,18 @@
         setMsg(`Chế độ: ${BH.WBP.modeCount} người`);
         if (BH.render) BH.render();
     }
+
+    // Cycle WB Party overlay: expanded ↔ hidden
+    function cycleOverlay() {
+        if (BH.WBP.overlayState === 'expanded') {
+            BH.WBP.overlayState = 'hidden';
+        } else {
+            BH.WBP.overlayState = 'expanded';
+        }
+        if (BH.render) BH.render();
+    }
+
+    BH.WBP.cycleOverlay = cycleOverlay;
 
     // =========================================================
     // HOTKEY
